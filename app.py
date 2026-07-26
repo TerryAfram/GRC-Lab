@@ -1,23 +1,11 @@
-import http.server
 import json
 import os
-import socket
 import subprocess
-import urllib.parse
+
+from flask import Flask, render_template_string, request
 
 
-def get_available_port(start_port: int) -> int:
-    for port in range(start_port, start_port + 100):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            try:
-                sock.bind(("0.0.0.0", port))
-                return port
-            except OSError:
-                continue
-    raise OSError(f"Unable to find an available port from {start_port}")
-
-
-PORT = get_available_port(int(os.environ.get("PORT", "8080")))
+app = Flask(__name__)
 
 HTML_PAGE = """<!DOCTYPE html>
 <html lang="en">
@@ -40,22 +28,23 @@ HTML_PAGE = """<!DOCTYPE html>
         <h2>🛡️ GRC Policy-as-Code Dashboard</h2>
         <form method="POST">
             <p><strong>Configuration JSON:</strong><br>
-            <textarea name="json_data" rows="8">{DEFAULT_JSON}</textarea></p>
+            <textarea name="json_data" rows="8">{{ json_data }}</textarea></p>
             <p><strong>Rego Policy:</strong><br>
-            <textarea name="rego_data" rows="8">{DEFAULT_REGO}</textarea></p>
+            <textarea name="rego_data" rows="8">{{ rego_data }}</textarea></p>
             <button type="submit">Run Evaluation</button>
         </form>
-        {OUTPUT}
+        {{ output_html | safe }}
     </div>
 </body>
 </html>
 """
 
+
 class DEFAULT_JSON:
     """Default JSON configuration provider."""
 
     @staticmethod
-    def get():
+    def get() -> str:
         config = {
             "resources": [
                 {
@@ -68,6 +57,7 @@ class DEFAULT_JSON:
         }
         return json.dumps(config, indent=2)
 
+
 DEFAULT_REGO = """package main
 
 deny[msg] {
@@ -78,60 +68,55 @@ deny[msg] {
 }"""
 
 
-class GRCRequestHandler(http.server.BaseHTTPRequestHandler):
-
-  def do_GET(self):
-    self.send_response(200)
-    self.send_header("Content-type", "text/html; charset=utf-8")
-    self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
-    self.send_header("Pragma", "no-cache")
-    self.send_header("Expires", "0")
-    self.end_headers()
-    default_json = DEFAULT_JSON.get()
-    html: str = (
-        HTML_PAGE.replace("{DEFAULT_JSON}", default_json)
-        .replace("{DEFAULT_REGO}", DEFAULT_REGO)
-        .replace("{OUTPUT}", "")
+@app.get("/")
+def index():
+    return render_template_string(
+        HTML_PAGE,
+        json_data=DEFAULT_JSON.get(),
+        rego_data=DEFAULT_REGO,
+        output_html="",
     )
-    self.wfile.write(html.encode("utf-8"))
 
-  def do_POST(self):
-    content_length = int(self.headers.get("Content-Length", 0))
-    post_data = self.rfile.read(content_length).decode("utf-8")
-    params = urllib.parse.parse_qs(post_data)
 
-    default_json = DEFAULT_JSON.get()
-    json_content = params.get("json_data", [default_json])[0]
-    rego_content = params.get("rego_data", [DEFAULT_REGO])[0]
+@app.get("/health")
+def health():
+    return "ok", 200
 
-    with open("temp_input.json", "w") as f:
-      f.write(json_content)
 
-    with open("temp_policy.rego", "w") as f:
-      f.write(rego_content)
+@app.post("/")
+def evaluate():
+    json_content = request.form.get("json_data", DEFAULT_JSON.get())
+    rego_content = request.form.get("rego_data", DEFAULT_REGO)
+
+    with open("temp_input.json", "w", encoding="utf-8") as f:
+        f.write(json_content)
+
+    with open("temp_policy.rego", "w", encoding="utf-8") as f:
+        f.write(rego_content)
 
     cmd = ["conftest", "test", "temp_input.json", "-p", "temp_policy.rego"]
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    output = result.stdout or result.stderr
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        output = result.stdout or result.stderr
+    except FileNotFoundError:
+        output = "Conftest CLI is not available in this environment."
+        result = subprocess.CompletedProcess(cmd, 1, output, "")
 
     if result.returncode == 0:
-      out_html = '<div class="success"><strong>✅ Passed! No violations found.</strong><pre>%s</pre></div>' % output
+        output_html = '<div class="success"><strong>✅ Passed! No violations found.</strong><pre>%s</pre></div>' % output
     else:
-      out_html = (
-          '<div class="error"><strong>❌ Failed! Violations detected:</strong><pre>%s</pre></div>'
-          % output
-      )
+        output_html = '<div class="error"><strong>❌ Failed! Violations detected:</strong><pre>%s</pre></div>' % output
 
-    self.send_response(200)
-    self.send_header("Content-type", "text/html")
-    self.end_headers()
-    html = HTML_PAGE.replace("{DEFAULT_JSON}", json_content).replace("{DEFAULT_REGO}", rego_content).replace("{OUTPUT}", out_html)
-    self.wfile.write(html.encode("utf-8"))
+    return render_template_string(
+        HTML_PAGE,
+        json_data=json_content,
+        rego_data=rego_content,
+        output_html=output_html,
+    )
 
 
 if __name__ == "__main__":
-  server = http.server.HTTPServer(("0.0.0.0", PORT), GRCRequestHandler)
-  print(f"Server started on port {PORT}...")
-  server.serve_forever() 
+    port = int(os.environ.get("PORT", "8080"))
+    app.run(host="0.0.0.0", port=port, debug=False)
 
 

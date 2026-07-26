@@ -112,6 +112,17 @@ Want to say “this helped me actually get it”?
 
 Open an issue, submit a PR, or yell at me nicely on [LinkedIn](https://www.linkedin.com/in/ashley-pearce). I’m always looking to make this more useful.
 
+## Web App Deployment
+
+The dashboard in [app.py](app.py) is now a Flask app. To run it locally:
+
+```bash
+python3 -m pip install -r requirements.txt
+python3 app.py
+```
+
+For deployment, the repository includes a Procfile for platforms such as Render or Heroku.
+
 ---
 
 ## Who Made This?
