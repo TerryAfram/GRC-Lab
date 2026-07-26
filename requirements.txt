@@ -1,3 +1,2 @@
 Flask>=3.0,<4.0
 gunicorn>=21.2,<22.0
-conftest>=8.0.0
