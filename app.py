@@ -186,6 +186,63 @@ def github_portfolio():
         return jsonify({'error': 'could not fetch portfolio', 'detail': str(e)}), 502
 
 
+@app.post('/api/fetch-portfolio-photo')
+def fetch_portfolio_photo():
+    """Search the GitHub repo for a likely profile image, download it, and save locally.
+
+    Returns JSON with the served URL on success.
+    """
+    base_api = 'https://api.github.com/repos/TerryAfram/GRC-portfolio/contents'
+    try:
+        with urllib.request.urlopen(base_api, timeout=10) as resp:
+            root = json.loads(resp.read().decode('utf-8'))
+    except Exception as e:
+        return jsonify({'error': 'failed to list repo contents', 'detail': str(e)}), 502
+
+    # helper to search a list of items for image files
+    def find_image(items):
+        for it in items:
+            if it.get('type') == 'file' and it.get('name', '').lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
+                return it.get('path')
+        return None
+
+    image_path = find_image(root)
+    # if not at root, try common folders
+    if not image_path:
+        # look for 'images', 'assets', or 'docs' dirs
+        for dname in ('images', 'assets', 'docs'):
+            try:
+                with urllib.request.urlopen(base_api + '/' + dname, timeout=8) as resp:
+                    items = json.loads(resp.read().decode('utf-8'))
+                    image_path = find_image(items)
+                    if image_path:
+                        break
+            except Exception:
+                continue
+
+    if not image_path:
+        return jsonify({'error': 'no image file found in repository root or common folders'}), 404
+
+    raw_url = f'https://raw.githubusercontent.com/TerryAfram/GRC-portfolio/main/{image_path}'
+    try:
+        with urllib.request.urlopen(raw_url, timeout=15) as resp:
+            data = resp.read()
+    except Exception as e:
+        return jsonify({'error': 'failed to download image', 'detail': str(e)}), 502
+
+    save_dir = os.path.join(os.getcwd(), 'static')
+    os.makedirs(save_dir, exist_ok=True)
+    save_path = os.path.join(save_dir, 'profile.jpg')
+    try:
+        with open(save_path, 'wb') as f:
+            f.write(data)
+    except Exception as e:
+        return jsonify({'error': 'failed to save image', 'detail': str(e)}), 500
+
+    base = request.host_url.rstrip('/')
+    return jsonify({'url': f"{base}/api/profile.jpg", 'source': raw_url}), 201
+
+
 @app.post("/")
 def evaluate():
     json_content = request.form.get("json_data", DEFAULT_JSON.get())
