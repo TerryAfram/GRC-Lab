@@ -101,7 +101,7 @@ def add_cors_headers(response):
     return response
 
 
-@app.options("/api/<path:unused>")
+@app.route("/api/<path:unused>", methods=["OPTIONS"])
 def api_options(unused):
     response = jsonify({})
     response.headers["Access-Control-Allow-Origin"] = "*"
