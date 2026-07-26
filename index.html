@@ -210,34 +210,26 @@
         <div class="card-title">Home</div>
         <p style="color:var(--muted); margin-bottom:12px">Welcome — quick links and an overview of the GRC labs in this repository.</p>
 
-        <div class="profile-card" style="margin-bottom:14px">
-          <div class="profile-avatar">
+        <div class="profile-card" style="margin-bottom:14px; gap:20px;">
+          <div class="profile-avatar" style="width:126px; height:126px; border-radius:20px;">
             <img src="https://raw.githubusercontent.com/TerryAfram/GRC-Lab/main/picterry.jpeg" alt="Terry Afram" onerror="this.onerror=null;this.src='/api/profile.jpg'" />
             <div class="profile-initials">TA</div>
           </div>
           <div class="profile-meta">
-            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px">
-              <div>
-                <div class="profile-name">Terry Afram <span style="font-weight:600;color:var(--muted)">CISA • PMP • MSc</span></div>
-                <div class="profile-bio">Security & GRC practitioner — building policy-as-code labs and training content.</div>
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:14px; flex-wrap:wrap;">
+              <div style="flex:1; min-width:220px;">
+                <div class="profile-name">Terry Afram</div>
+                <div style="margin-top:6px; font-size:0.94rem; color:var(--muted);">Security & GRC practitioner — building policy-as-code labs and training training content.</div>
+                <div style="margin-top:14px; display:grid; gap:8px; font-size:0.95rem; line-height:1.5;">
+                  <div><strong>Certifications</strong>: CISA • PMP • MSc</div>
+                  <div><strong>Location</strong>: USA</div>
+                  <div><strong>Status</strong>: Open to work</div>
+                </div>
               </div>
-              <div class="profile-badges">
-                <span style="width:10px;height:10px;background:#34d399;border-radius:50%;display:inline-block"></span>
-                <span style="color:var(--muted);font-size:.95rem">Open to work</span>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                <a href="mailto:aframterry@gmail.com" class="button ghost" style="padding:10px 14px; border-radius:10px">Email</a>
+                <a href="https://www.linkedin.com/in/terryaframkumi-cisa-pmp-msc/" target="_blank" rel="noopener" class="button ghost" style="padding:10px 14px; border-radius:10px">LinkedIn</a>
               </div>
-            </div>
-            <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
-              <a href="mailto:aframterry@gmail.com" class="button ghost" style="padding:8px 12px; border-radius:10px">Email</a>
-              <div style="display:flex; gap:6px; align-items:center; background:rgba(255,255,255,0.04); padding:6px 10px; border-radius:10px">
-                <span style="font-size:18px">🇺🇸</span>
-                <span style="color:var(--muted)">USA</span>
-              </div>
-              <a href="https://www.linkedin.com/in/terryaframkumi-cisa-pmp-msc/" target="_blank" rel="noopener" class="button ghost" style="padding:8px 12px; border-radius:10px">LinkedIn</a>
-              <a href="https://github.com/TerryAfram" target="_blank" rel="noopener" class="button ghost" style="padding:8px 12px; border-radius:10px">Portfolio (GitHub)</a>
-              <label class="button ghost" style="padding:8px 12px; border-radius:10px; cursor:pointer;">
-                Upload Photo
-                <input id="uploadPhoto" type="file" accept="image/*" style="display:none">
-              </label>
             </div>
           </div>
         </div>
