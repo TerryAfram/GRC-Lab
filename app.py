@@ -5,6 +5,10 @@ import subprocess
 from flask import Flask, render_template_string, request
 
 
+def get_runtime_port() -> int:
+    return int(os.environ.get("PORT", "8080"))
+
+
 app = Flask(__name__)
 
 HTML_PAGE = """<!DOCTYPE html>
@@ -116,7 +120,6 @@ def evaluate():
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", "8080"))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host="0.0.0.0", port=get_runtime_port(), debug=False)
 
 
