@@ -279,7 +279,7 @@
             </div>
 
             <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px">
-              <button class="button secondary" id="loadDemo">Load Demo Data</button>
+              
               <button class="button primary" id="backupBtn">Back Up</button>
               <button class="button ghost" id="restoreBtn">Restore</button>
             </div>
@@ -332,8 +332,7 @@ deny[msg] {
         <div class="card-title">LEARN & PRACTICE</div>
         <div class="pane">
           <div style="display:grid; gap:10px">
-            <button class="button ghost" id="startHere">Start Here</button>
-            <button class="button ghost" id="guideBtn">Guide</button>
+            
             <button class="button ghost" id="frameworksBtn">Frameworks 480+</button>
             <button class="button ghost" id="glossaryBtn">GRC Glossary</button>
             <button class="button ghost" id="practiceScenariosBtn">Practice Scenarios</button>
@@ -480,32 +479,11 @@ This front end is static on GitHub Pages; the backend is hosted separately on Re
       window.open('https://github.com/Johnbjoseph-cybersec/GRC-Playground/blob/main/README.md', '_blank');
     });
 
-    // Demo data and backup/restore
-    const loadDemoBtn = document.getElementById('loadDemo');
+    // Backup/restore
     const backupBtn = document.getElementById('backupBtn');
     const restoreBtn = document.getElementById('restoreBtn');
     const backupStatus = document.getElementById('backupStatus');
     const availableList = homePanel.querySelector('.info-list');
-
-    const DEMO_JSON = JSON.stringify({
-      resources: [{ type: 'aws_s3_bucket', values: { acl: 'public-read' } }]
-    }, null, 2);
-    const DEMO_REGO = `package main
-
-deny[msg] {
-  r := input.resources[_]
-  r.type == "aws_s3_bucket"
-  r.values.acl == "public-read"
-  msg = "S3 bucket is publicly accessible"
-}`;
-
-    loadDemoBtn.addEventListener('click', () => {
-      jsonArea.value = DEMO_JSON;
-      regoArea.value = DEMO_REGO;
-      // open labs editor
-      openLabsBtn.click();
-      setStatus('Demo data loaded into the editor.', 'success');
-    });
 
     backupBtn.addEventListener('click', () => {
       const payload = { json: jsonArea.value, rego: regoArea.value, ts: new Date().toISOString() };
