@@ -3,28 +3,292 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GRC Lab</title>
+  <title>GRC Policy-as-Code Dashboard</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f7f6; color: #222; }
-    .hero { background: linear-gradient(135deg, #0f4c81, #1d73c5); color: white; padding: 60px 24px; text-align: center; }
-    .card { max-width: 900px; margin: 24px auto; background: white; padding: 24px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-    a { color: #0f4c81; }
-    code { background: #f1f3f5; padding: 2px 6px; border-radius: 4px; }
+    :root {
+      color-scheme: light;
+      --bg: #f4f7f6;
+      --panel: #ffffff;
+      --panel-alt: #f8fbfa;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #0f4c81;
+      --accent: #1d73c5;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --border: #d1d5db;
+    }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, rgba(29,115,197,0.18), transparent 35%),
+                  linear-gradient(180deg, #eef5f9 0%, #f4f7f6 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      padding: 48px 24px 20px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: clamp(2.5rem, 4vw, 3.5rem);
+      letter-spacing: -0.04em;
+    }
+    header p {
+      margin: 16px auto 0;
+      max-width: 720px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    .layout {
+      display: grid;
+      gap: 24px;
+      max-width: 1180px;
+      margin: 0 auto 48px;
+      padding: 0 24px 24px;
+      grid-template-columns: minmax(0, 1fr) 360px;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: 0 24px 60px rgba(15, 35, 64, 0.08);
+      padding: 28px;
+    }
+    .panel h2 {
+      margin-top: 0;
+      font-size: 1.5rem;
+    }
+    .section {
+      margin-bottom: 24px;
+    }
+    .section:last-child {
+      margin-bottom: 0;
+    }
+    .grid-2 {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: 1fr 1fr;
+    }
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    textarea {
+      width: 100%;
+      min-height: 260px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--panel-alt);
+      padding: 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.96rem;
+      color: var(--text);
+      box-sizing: border-box;
+      resize: vertical;
+    }
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-top: 16px;
+    }
+    button,
+    .button-link {
+      padding: 12px 18px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    button:hover,
+    .button-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(15, 35, 64, 0.12);
+    }
+    button.primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+    }
+    button.secondary {
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .note {
+      padding: 16px;
+      border-radius: 16px;
+      background: #eef6ff;
+      border: 1px solid rgba(15, 73, 189, 0.14);
+      color: #0f4c81;
+      line-height: 1.7;
+    }
+    .info-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .info-list li {
+      padding: 10px 0;
+      border-bottom: 1px solid #eaecf0;
+    }
+    .info-list li:last-child { border-bottom: none; }
+    .info-list a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .status-box {
+      white-space: pre-wrap;
+      background: #111827;
+      color: #f8fafc;
+      border-radius: 16px;
+      padding: 18px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.94rem;
+      min-height: 120px;
+      overflow-x: auto;
+    }
+    .status-box.empty {
+      color: var(--muted);
+    }
+    .footer {
+      max-width: 1180px;
+      margin: 0 auto 40px;
+      padding: 0 24px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      text-align: center;
+    }
+    @media (max-width: 960px) {
+      .layout { grid-template-columns: 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-  <div class="hero">
-    <h1>GRC Lab</h1>
-    <p>A simple public landing page for the GRC policy-as-code playground.</p>
-  </div>
-  <div class="card">
-    <h2>What this is</h2>
-    <p>This page links to the GRC policy-as-code dashboard and the repository content for hands-on learning.</p>
-    <ul>
-      <li><a href="https://github.com/TerryAfram/GRC-Lab">GitHub repository</a></li>
-      <li><a href="https://github.com/TerryAfram/GRC-Lab/tree/main/Policy-As-Code">Policy-as-Code labs</a></li>
-      <li><a href="https://github.com/TerryAfram/GRC-Lab/tree/main/Control-Mapping">Control mapping labs</a></li>
-    </ul>
-  </div>
+  <header>
+    <h1>GRC Policy-as-Code Dashboard</h1>
+    <p>Static GitHub Pages dashboard for policy-as-code learning. Edit the sample JSON and Rego policy in your browser, then run the evaluation locally or deploy the backend separately.</p>
+  </header>
+
+  <main class="layout">
+    <section class="panel">
+      <div class="section">
+        <h2>Dashboard workspace</h2>
+        <p class="note">This page is a static front-end. Actual policy evaluation is not available on GitHub Pages. Use the local app or a separate backend service for live results.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="section">
+          <label for="jsonInput">Sample configuration JSON</label>
+          <textarea id="jsonInput" spellcheck="false">{
+  "resources": [
+    {
+      "type": "aws_s3_bucket",
+      "values": {
+        "acl": "public-read"
+      }
+    }
+  ]
+}</textarea>
+        </div>
+        <div class="section">
+          <label for="regoInput">Sample Rego policy</label>
+          <textarea id="regoInput" spellcheck="false">package main
+
+deny[msg] {
+  r := input.resources[_]
+  r.type == "aws_s3_bucket"
+  r.values.acl == "public-read"
+  msg = "S3 bucket is publicly accessible"
+}</textarea>
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button class="primary" id="previewButton">Preview inputs</button>
+        <button class="secondary" id="downloadInput">Download JSON</button>
+        <button class="secondary" id="downloadPolicy">Download Rego</button>
+      </div>
+
+      <div class="section" style="margin-top:24px;">
+        <h2>Evaluation output</h2>
+        <div id="statusOutput" class="status-box empty">Actual evaluation is only available in the local Flask app or a deployed backend.
+
+To run locally:
+1. Start the app with <code>python3 app.py</code>
+2. Open <code>http://localhost:8080</code>
+
+To deploy a live backend, host the Flask app separately and wire this static UI to it.</div>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="section">
+        <h2>Quick links</h2>
+        <ul class="info-list">
+          <li><a href="https://github.com/TerryAfram/GRC-Lab">Repository</a></li>
+          <li><a href="https://github.com/TerryAfram/GRC-Lab/tree/main/Policy-As-Code">Policy-as-Code labs</a></li>
+          <li><a href="https://github.com/TerryAfram/GRC-Lab/tree/main/Control-Mapping">Control mapping labs</a></li>
+          <li><a href="https://github.com/TerryAfram/GRC-Lab/blob/main/app.py">Local Flask app source</a></li>
+          <li><a href="https://terryafram.github.io/GRC-Lab/">GitHub Pages site</a></li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>How it works</h2>
+        <p>GitHub Pages serves only static files. The editor experience on this page is client-side only, and it does not execute policy evaluation in the browser.</p>
+      </div>
+
+      <div class="section">
+        <h2>Local run</h2>
+        <p class="note">To get a working policy-as-code command center, run the app locally in your dev container with:</p>
+        <p><code>python3 app.py</code></p>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <div>Static dashboard generated for GitHub Pages.</div>
+    <div>Use the local Flask app for real policy evaluation.</div>
+  </footer>
+
+  <script>
+    const jsonArea = document.getElementById('jsonInput');
+    const regoArea = document.getElementById('regoInput');
+    const statusOutput = document.getElementById('statusOutput');
+
+    document.getElementById('previewButton').addEventListener('click', () => {
+      statusOutput.classList.remove('empty');
+      statusOutput.textContent = 'Previewing current inputs...\n\nConfiguration JSON:\n' + jsonArea.value + '\n\nRego policy:\n' + regoArea.value + '\n\nNote: This is a local preview only. Run the Flask app locally or deploy the backend for real evaluation.';
+    });
+
+    function downloadFile(filename, content) {
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    document.getElementById('downloadInput').addEventListener('click', () => {
+      downloadFile('input.json', jsonArea.value);
+    });
+
+    document.getElementById('downloadPolicy').addEventListener('click', () => {
+      downloadFile('policy.rego', regoArea.value);
+    });
+  </script>
 </body>
 </html>
