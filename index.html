@@ -233,6 +233,11 @@
                 <span style="color:var(--muted)">USA</span>
               </div>
               <a href="https://www.linkedin.com/in/terryaframkumi-cisa-pmp-msc/" target="_blank" rel="noopener" class="button ghost" style="padding:8px 12px; border-radius:10px">LinkedIn</a>
+              <a href="https://github.com/TerryAfram" target="_blank" rel="noopener" class="button ghost" style="padding:8px 12px; border-radius:10px">Portfolio (GitHub)</a>
+              <label class="button ghost" style="padding:8px 12px; border-radius:10px; cursor:pointer;">
+                Upload Photo
+                <input id="uploadPhoto" type="file" accept="image/*" style="display:none">
+              </label>
             </div>
           </div>
         </div>
@@ -555,6 +560,44 @@ deny[msg] {
       learnPanel.style.display = 'none';
       homePanel.style.display = 'block';
     });
+
+    // Profile photo upload / load from localStorage
+    const uploadInput = document.getElementById('uploadPhoto');
+    const profileAvatarImg = document.querySelector('.profile-avatar img');
+    const profileInitials = document.querySelector('.profile-initials');
+
+    const loadStoredProfile = () => {
+      try {
+        const stored = localStorage.getItem('grc_profile_photo');
+        if (stored) {
+          profileAvatarImg.src = stored;
+          profileAvatarImg.style.display = 'block';
+          profileInitials.style.display = 'none';
+        } else {
+          profileAvatarImg.style.display = 'none';
+          profileInitials.style.display = 'block';
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    uploadInput.addEventListener('change', (ev) => {
+      const file = ev.target.files && ev.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const data = reader.result;
+        try { localStorage.setItem('grc_profile_photo', data); } catch (e) { console.warn('Cannot store image in localStorage'); }
+        profileAvatarImg.src = data;
+        profileAvatarImg.style.display = 'block';
+        profileInitials.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // load stored profile photo on startup
+    loadStoredProfile();
 
     healthButton.addEventListener('click', checkBackendHealth);
     backendUrlInput.addEventListener('change', () => setHealth('Backend URL updated', 'pending'));
