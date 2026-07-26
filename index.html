@@ -554,11 +554,15 @@ This front end is static on GitHub Pages; the backend is hosted separately on Re
           profileAvatarImg.style.display = 'block';
           profileInitials.style.display = 'none';
         } else {
-          profileAvatarImg.style.display = 'none';
-          profileInitials.style.display = 'block';
+          profileAvatarImg.src = 'https://raw.githubusercontent.com/TerryAfram/GRC-Lab/main/picterry.jpeg';
+          profileAvatarImg.style.display = 'block';
+          profileInitials.style.display = 'none';
         }
       } catch (e) {
         console.error(e);
+        profileAvatarImg.src = 'https://raw.githubusercontent.com/TerryAfram/GRC-Lab/main/picterry.jpeg';
+        profileAvatarImg.style.display = 'block';
+        profileInitials.style.display = 'none';
       }
     };
 
