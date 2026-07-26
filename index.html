@@ -214,8 +214,13 @@ deny[msg] {
         </div>
       </div>
 
+      <div class="section">
+        <label for="backendUrl">Backend API URL</label>
+        <textarea id="backendUrl" rows="1" spellcheck="false">http://localhost:8080</textarea>
+      </div>
       <div class="button-row">
         <button class="primary" id="previewButton">Preview inputs</button>
+        <button class="secondary" id="evaluateButton">Evaluate via API</button>
         <button class="secondary" id="downloadInput">Download JSON</button>
         <button class="secondary" id="downloadPolicy">Download Rego</button>
       </div>
@@ -228,7 +233,7 @@ To run locally:
 1. Start the app with <code>python3 app.py</code>
 2. Open <code>http://localhost:8080</code>
 
-To deploy a live backend, host the Flask app separately and wire this static UI to it.</div>
+To deploy a live backend, host the Flask app separately and set the Backend API URL above.</div>
       </div>
     </section>
 
@@ -265,11 +270,44 @@ To deploy a live backend, host the Flask app separately and wire this static UI 
   <script>
     const jsonArea = document.getElementById('jsonInput');
     const regoArea = document.getElementById('regoInput');
+    const backendUrlInput = document.getElementById('backendUrl');
     const statusOutput = document.getElementById('statusOutput');
 
-    document.getElementById('previewButton').addEventListener('click', () => {
+    const renderStatus = (message, success = null) => {
       statusOutput.classList.remove('empty');
-      statusOutput.textContent = 'Previewing current inputs...\n\nConfiguration JSON:\n' + jsonArea.value + '\n\nRego policy:\n' + regoArea.value + '\n\nNote: This is a local preview only. Run the Flask app locally or deploy the backend for real evaluation.';
+      statusOutput.textContent = message;
+      statusOutput.style.borderColor = success === true ? '#16a34a' : success === false ? '#dc2626' : 'var(--border)';
+    };
+
+    document.getElementById('previewButton').addEventListener('click', () => {
+      renderStatus('Previewing current inputs...\n\nConfiguration JSON:\n' + jsonArea.value + '\n\nRego policy:\n' + regoArea.value + '\n\nNote: This is a local preview only. Run the Flask app locally or deploy the backend for real evaluation.');
+    });
+
+    document.getElementById('evaluateButton').addEventListener('click', async () => {
+      const backendUrl = backendUrlInput.value.trim().replace(/\/$/, '');
+      if (!backendUrl) {
+        renderStatus('Please enter a valid backend API URL before evaluating.', false);
+        return;
+      }
+
+      renderStatus('Sending evaluation request to ' + backendUrl + '/api/evaluate ...');
+
+      try {
+        const response = await fetch(backendUrl + '/api/evaluate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ json_data: jsonArea.value, rego_data: regoArea.value }),
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          renderStatus('✅ Success!\n\n' + result.output, true);
+        } else {
+          renderStatus('❌ Evaluation failed with status ' + response.status + ':\n\n' + result.output, false);
+        }
+      } catch (error) {
+        renderStatus('Network error when calling backend: ' + error.message + '\n\nMake sure the backend URL is correct and supports CORS.', false);
+      }
     });
 
     function downloadFile(filename, content) {

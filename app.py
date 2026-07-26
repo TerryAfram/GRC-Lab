@@ -2,7 +2,7 @@ import json
 import os
 import subprocess
 
-from flask import Flask, render_template_string, request
+from flask import Flask, jsonify, render_template_string, request
 
 
 def get_runtime_port() -> int:
@@ -85,6 +85,59 @@ def index():
 @app.get("/health")
 def health():
     return "ok", 200
+
+
+@app.get("/api/health")
+def api_health():
+    return jsonify({"status": "ok", "message": "API is online"}), 200
+
+
+@app.after_request
+def add_cors_headers(response):
+    if request.path.startswith("/api/"):
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    return response
+
+
+@app.options("/api/<path:unused>")
+def api_options(unused):
+    response = jsonify({})
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    return response
+
+
+@app.post("/api/evaluate")
+def api_evaluate():
+    data = request.get_json(silent=True) or {}
+    json_content = data.get("json_data", DEFAULT_JSON.get())
+    rego_content = data.get("rego_data", DEFAULT_REGO)
+
+    with open("temp_input.json", "w", encoding="utf-8") as f:
+        f.write(json_content)
+
+    with open("temp_policy.rego", "w", encoding="utf-8") as f:
+        f.write(rego_content)
+
+    cmd = ["conftest", "test", "temp_input.json", "-p", "temp_policy.rego"]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        output = result.stdout or result.stderr
+    except FileNotFoundError:
+        output = "Conftest CLI is not available in this environment."
+        result = subprocess.CompletedProcess(cmd, 1, output, "")
+
+    success = result.returncode == 0
+    status_code = 200 if success else 400
+    return jsonify({
+        "success": success,
+        "output": output,
+        "json_data": json_content,
+        "rego_data": rego_content,
+    }), status_code
 
 
 @app.post("/")
