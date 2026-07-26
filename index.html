@@ -261,7 +261,6 @@
               <button class="button ghost" id="tileDashboard">Dashboard</button>
               <button class="button ghost" id="tileLearn">LEARN & PRACTICE</button>
               <button class="button ghost" id="tileAI">AI AGENT</button>
-              <button class="button ghost" id="tileProjects">PROJECTS</button>
               <button class="button ghost" id="tileInventory">INVENTORY & POLICIES</button>
               <button class="button ghost" id="tileRisk">RISK & CONTROLS</button>
               <button class="button ghost" id="tileAudit">AUDIT & COMPLIANCE</button>
@@ -331,7 +330,6 @@ deny[msg] {
             <button class="button ghost" id="guidedMissionsBtn">Guided Missions Lab</button>
             <button class="button ghost" id="isoBtn">ISO 27001 Lead Implementer</button>
             <button class="button ghost" id="interviewPrepBtn">Interview Prep Lab</button>
-            <button class="button ghost" id="projectsBtn">Projects (0)</button>
             <button class="button ghost" id="portfolioBtn">Portfolio Builder</button>
           </div>
           <div class="actions" style="margin-top:12px">
@@ -638,8 +636,6 @@ This front end is static on GitHub Pages; the backend is hosted separately on Re
     window.addEventListener('load', checkBackendHealth);
 
     // Projects tile opens the projects page (new tab)
-    const tileProjects = document.getElementById('tileProjects');
-    if (tileProjects) tileProjects.addEventListener('click', () => { window.open('projects.html', '_blank'); });
   </script>
 </body>
 </html>
