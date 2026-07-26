@@ -269,6 +269,7 @@
               <button class="button ghost" id="tileDashboard">Dashboard</button>
               <button class="button ghost" id="tileLearn">LEARN & PRACTICE</button>
               <button class="button ghost" id="tileAI">AI AGENT</button>
+              <button class="button ghost" id="tileProjects">PROJECTS</button>
               <button class="button ghost" id="tileInventory">INVENTORY & POLICIES</button>
               <button class="button ghost" id="tileRisk">RISK & CONTROLS</button>
               <button class="button ghost" id="tileAudit">AUDIT & COMPLIANCE</button>
@@ -661,6 +662,10 @@ deny[msg] {
     });
 
     window.addEventListener('load', checkBackendHealth);
+
+    // Projects tile opens the projects page (new tab)
+    const tileProjects = document.getElementById('tileProjects');
+    if (tileProjects) tileProjects.addEventListener('click', () => { window.open('projects.html', '_blank'); });
   </script>
 </body>
 </html>

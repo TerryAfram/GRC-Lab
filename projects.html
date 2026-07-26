@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Projects — GRC Portfolio</title>
+  <style>
+    :root { --bg:#07101b; --card:#0f1d2b; --muted:#94a3b8; --accent:#38bdf8; --text:#f8fafc; }
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial;background:linear-gradient(180deg,#07101b,#06121a);color:var(--text)}
+    .wrap{max-width:1100px;margin:32px auto;padding:20px}
+    .header{display:flex;align-items:center;gap:18px;margin-bottom:18px}
+    .avatar{width:96px;height:96px;border-radius:12px;background:linear-gradient(135deg,#0ea5e9,#22d3ee);overflow:hidden;flex-shrink:0}
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    h1{margin:0;font-size:1.6rem}
+    p.lead{color:var(--muted);margin:6px 0 18px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+    .card{background:var(--card);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.04)}
+    .repo-title{font-weight:800;margin:0 0 6px}
+    .repo-desc{color:var(--muted);font-size:0.95rem;margin-bottom:10px}
+    .meta{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:0.9rem}
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .chip{background:rgba(255,255,255,0.04);padding:6px 10px;border-radius:999px;font-weight:800;color:var(--text);font-size:0.85rem}
+    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    a.button{background:linear-gradient(135deg,#0ea5e9,#22d3ee);color:#06121c;padding:8px 12px;border-radius:10px;text-decoration:none;font-weight:700}
+    footer{color:var(--muted);text-align:center;margin-top:20px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="header">
+        <div class="avatar"><img id="profileImage" src="/api/profile.jpg" alt="Profile"></div>
+        <div>
+          <h1>Projects & Open Source</h1>
+          <p class="lead">Repositories and technologies — bold, scannable cards for recruiters.</p>
+        </div>
+      </div>
+      <div>
+        <a class="button" href="/">Back to Dashboard</a>
+      </div>
+    </div>
+
+    <div id="repos" class="grid"></div>
+
+    <footer>
+      Built from the GitHub portfolio of Terry Afram — data fetched from GitHub public API.
+    </footer>
+  </div>
+
+  <script>
+    const reposContainer = document.getElementById('repos');
+
+    const languageIcon = (lang) => {
+      if (!lang) return '•';
+      const map = {
+        'Python':'🐍','JavaScript':'⚡','TypeScript':'🟦','Go':'🐹','Shell':'🐚','Terraform':'🔧','HTML':'🌐','CSS':'🎨','Java':'☕','Ruby':'💎'
+      };
+      return map[lang] || '•';
+    };
+
+    const renderRepo = (r) => {
+      const el = document.createElement('div'); el.className='card';
+      const title = `<div class="repo-title"><a href="${r.html_url}" target="_blank" style="color:var(--text);text-decoration:none">${r.name}</a></div>`;
+      const desc = `<div class="repo-desc">${r.description||''}</div>`;
+      const meta = `<div class="meta">⭐ ${r.stargazers_count} • Forks ${r.forks_count} • ${r.language||'—'}</div>`;
+      const languages = `<div class="chips"><div class="chip">${languageIcon(r.language)} ${r.language||'Unknown'}</div></div>`;
+      el.innerHTML = title + desc + meta + languages;
+      return el;
+    };
+
+    const fetchRepos = async () => {
+      reposContainer.innerHTML = '<div style="color:var(--muted)">Loading repositories…</div>';
+      try {
+        const resp = await fetch('https://api.github.com/users/TerryAfram/repos?per_page=100');
+        if (!resp.ok) throw new Error('GitHub API error ' + resp.status);
+        const data = await resp.json();
+        data.sort((a,b)=>b.stargazers_count - a.stargazers_count);
+        reposContainer.innerHTML = '';
+        if (!data.length) reposContainer.innerHTML = '<div style="color:var(--muted)">No repositories found.</div>';
+        data.forEach(r => reposContainer.appendChild(renderRepo(r)));
+      } catch (e) {
+        reposContainer.innerHTML = '<div style="color:var(--muted)">Failed to load repos: '+e.message+'</div>';
+      }
+    };
+
+    window.addEventListener('load', fetchRepos);
+  </script>
+</body>
+</html>
