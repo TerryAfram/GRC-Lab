@@ -67,6 +67,32 @@
       padding: 28px;
       overflow: hidden;
     }
+    .profile-card {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,.06);
+    }
+    .profile-avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg,#0ea5e9,#22d3ee);
+    }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .profile-initials { font-weight: 800; color: #06121c; font-size: 28px; }
+    .profile-meta { flex: 1; }
+    .profile-name { font-size: 1.05rem; font-weight: 800; }
+    .profile-bio { color: var(--muted); margin-top: 6px; }
+    .profile-badges { display: flex; gap: 8px; align-items: center; margin-left: 12px; }
     .card-title {
       margin: 0 0 20px;
       font-size: 1.35rem;
@@ -184,26 +210,29 @@
         <div class="card-title">Home</div>
         <p style="color:var(--muted); margin-bottom:12px">Welcome — quick links and an overview of the GRC labs in this repository.</p>
 
-        <div style="display:flex; gap:12px; align-items:center; margin-bottom:14px">
-          <div style="width:84px; height:84px; border-radius:12px; overflow:hidden; background:linear-gradient(135deg,#0ea5e9,#22d3ee); display:flex; align-items:center; justify-content:center;">
-            <img src="https://media.licdn.com/dms/image/C4E03AQEEXAMPLE/profile-displayphoto-shrink_200_200/0/0000000000.jpg" alt="Terry" style="width:80px;height:80px;object-fit:cover;display:block;" onerror="this.style.display='none'"/>
-            <div id="initials" style="font-weight:800;color:#06121c;font-size:28px;">TA</div>
+        <div class="profile-card" style="margin-bottom:14px">
+          <div class="profile-avatar">
+            <img src="https://media.licdn.com/dms/image/C4E03AQEEXAMPLE/profile-displayphoto-shrink_200_200/0/0000000000.jpg" alt="Terry Afram" onerror="this.style.display='none'" />
+            <div class="profile-initials">TA</div>
           </div>
-          <div style="flex:1">
-            <div style="display:flex; align-items:center; gap:12px;">
-              <div style="font-size:1.05rem; font-weight:800">Terry Afram, CISA • PMP • MSc</div>
-              <div style="display:inline-flex; align-items:center; gap:8px">
+          <div class="profile-meta">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px">
+              <div>
+                <div class="profile-name">Terry Afram <span style="font-weight:600;color:var(--muted)">CISA • PMP • MSc</span></div>
+                <div class="profile-bio">Security & GRC practitioner — building policy-as-code labs and training content.</div>
+              </div>
+              <div class="profile-badges">
                 <span style="width:10px;height:10px;background:#34d399;border-radius:50%;display:inline-block"></span>
-                <span style="color:var(--muted); font-size:0.95rem">Open to work</span>
+                <span style="color:var(--muted);font-size:.95rem">Open to work</span>
               </div>
             </div>
-            <div style="color:var(--muted); margin-top:6px">Security & GRC practitioner. Based in the USA.</div>
-            <div style="margin-top:8px; display:flex; gap:10px; align-items:center">
-              <a href="mailto:aframterry@gmail.com" class="button ghost" style="padding:8px 12px; border-radius:10px">aframterry@gmail.com</a>
-              <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,0.04); padding:6px 10px; border-radius:10px">
+            <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+              <a href="mailto:aframterry@gmail.com" class="button ghost" style="padding:8px 12px; border-radius:10px">Email</a>
+              <div style="display:flex; gap:6px; align-items:center; background:rgba(255,255,255,0.04); padding:6px 10px; border-radius:10px">
                 <span style="font-size:18px">🇺🇸</span>
                 <span style="color:var(--muted)">USA</span>
               </div>
+              <a href="https://www.linkedin.com/in/terryaframkumi-cisa-pmp-msc/" target="_blank" rel="noopener" class="button ghost" style="padding:8px 12px; border-radius:10px">LinkedIn</a>
             </div>
           </div>
         </div>
