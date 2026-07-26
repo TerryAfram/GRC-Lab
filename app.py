@@ -1,8 +1,9 @@
 import json
 import os
 import subprocess
+import urllib.request
 
-from flask import Flask, jsonify, render_template_string, request
+from flask import Flask, jsonify, render_template_string, request, send_from_directory, abort
 
 
 def get_runtime_port() -> int:
@@ -138,6 +139,51 @@ def api_evaluate():
         "json_data": json_content,
         "rego_data": rego_content,
     }), status_code
+
+
+@app.post('/api/upload-profile')
+def upload_profile():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+    f = request.files['file']
+    if f.filename == '':
+        return jsonify({'error': 'Empty filename'}), 400
+    save_dir = os.path.join(os.getcwd(), 'static')
+    os.makedirs(save_dir, exist_ok=True)
+    save_path = os.path.join(save_dir, 'profile.jpg')
+    f.save(save_path)
+    # Return a URL that the front-end can use to GET the image via this service
+    base = request.host_url.rstrip('/')
+    return jsonify({'url': f"{base}/api/profile.jpg"}), 201
+
+
+@app.get('/api/profile.jpg')
+def serve_profile():
+    save_dir = os.path.join(os.getcwd(), 'static')
+    file_path = os.path.join(save_dir, 'profile.jpg')
+    if not os.path.exists(file_path):
+        return jsonify({'error': 'Profile image not found'}), 404
+    return send_from_directory(save_dir, 'profile.jpg')
+
+
+@app.get('/api/github-portfolio')
+def github_portfolio():
+    # Fetch basic repo info from GitHub API for the portfolio repository
+    repo_api = 'https://api.github.com/repos/TerryAfram/GRC-portfolio'
+    try:
+        with urllib.request.urlopen(repo_api, timeout=10) as resp:
+            body = resp.read().decode('utf-8')
+            data = json.loads(body)
+            summary = {
+                'name': data.get('name'),
+                'description': data.get('description'),
+                'stars': data.get('stargazers_count'),
+                'forks': data.get('forks_count'),
+                'url': data.get('html_url')
+            }
+            return jsonify(summary)
+    except Exception as e:
+        return jsonify({'error': 'could not fetch portfolio', 'detail': str(e)}), 502
 
 
 @app.post("/")

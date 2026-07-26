@@ -241,6 +241,7 @@
             </div>
           </div>
         </div>
+        <div id="portfolioInfo" style="margin-top:8px; color:var(--muted); font-size:0.95rem"></div>
         <ul class="info-list">
           <li><strong>Repository</strong><a href="https://github.com/Johnbjoseph-cybersec/GRC-Playground" target="_blank" rel="noopener">GRC-Playground</a></li>
           <li><strong>LinkedIn</strong><a href="https://www.linkedin.com/in/terryaframkumi-cisa-pmp-msc/" target="_blank" rel="noopener">Terry Afram</a></li>
@@ -586,18 +587,67 @@ deny[msg] {
       const file = ev.target.files && ev.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = () => {
+      reader.onload = async () => {
         const data = reader.result;
         try { localStorage.setItem('grc_profile_photo', data); } catch (e) { console.warn('Cannot store image in localStorage'); }
         profileAvatarImg.src = data;
         profileAvatarImg.style.display = 'block';
         profileInitials.style.display = 'none';
+
+        // Try uploading to the backend if configured
+        const backend = backendUrlInput.value.trim().replace(/\/$/, '');
+        if (backend) {
+          try {
+            const form = new FormData();
+            form.append('file', file, file.name);
+            const resp = await fetch(backend + '/api/upload-profile', { method: 'POST', body: form });
+            if (resp.ok) {
+              const j = await resp.json();
+              // If backend serves the image, try to use that URL
+              if (j.url) {
+                profileAvatarImg.src = j.url + '?_ts=' + Date.now();
+                profileAvatarImg.style.display = 'block';
+                profileInitials.style.display = 'none';
+              }
+            } else {
+              console.warn('Server upload failed', resp.status);
+            }
+          } catch (e) { console.warn('Upload to server failed', e); }
+        }
       };
       reader.readAsDataURL(file);
     });
 
     // load stored profile photo on startup
     loadStoredProfile();
+
+    // Portfolio fetch
+    const portfolioInfo = document.getElementById('portfolioInfo');
+    const renderPortfolio = (data) => {
+      if (!data) { portfolioInfo.textContent = 'Portfolio not available.'; return; }
+      if (data.error) { portfolioInfo.textContent = 'Portfolio: ' + (data.detail || data.error); return; }
+      portfolioInfo.innerHTML = `Repository: <a href="${data.url}" target="_blank">${data.name}</a> — ${data.description || ''} &nbsp; ⭐ ${data.stars || 0} • Forks ${data.forks || 0}`;
+    };
+
+    const fetchPortfolio = async () => {
+      const backend = backendUrlInput.value.trim().replace(/\/$/, '');
+      try {
+        let resp;
+        if (backend) {
+          resp = await fetch(backend + '/api/github-portfolio');
+        } else {
+          resp = await fetch('https://api.github.com/repos/TerryAfram/GRC-portfolio');
+        }
+        const j = await resp.json();
+        renderPortfolio(j);
+      } catch (e) {
+        renderPortfolio({ error: 'failed', detail: e.message });
+      }
+    };
+
+    // Fetch on load and when backend changes
+    window.addEventListener('load', () => { fetchPortfolio(); checkBackendHealth(); });
+    backendUrlInput.addEventListener('blur', fetchPortfolio);
 
     healthButton.addEventListener('click', checkBackendHealth);
     backendUrlInput.addEventListener('change', () => setHealth('Backend URL updated', 'pending'));
