@@ -3,7 +3,7 @@ services:
     name: grc-dashboard
     env: python
     plan: free
-    buildCommand: "pip install -r requirements.txt && pip install conftest"
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt && curl -L -o /tmp/conftest.tar.gz https://github.com/open-policy-agent/conftest/releases/download/v0.68.2/conftest_0.68.2_Linux_x86_64.tar.gz && tar -xzf /tmp/conftest.tar.gz -C /tmp && mv /tmp/conftest /usr/local/bin/ && chmod +x /usr/local/bin/conftest"
     startCommand: "gunicorn app:app --bind 0.0.0.0:$PORT"
     envVars:
       - key: PYTHON_VERSION
