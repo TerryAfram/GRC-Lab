@@ -1,0 +1,10 @@
+{
+  "resources": [
+    {
+      "type": "aws_s3_bucket",
+      "values": {
+        "acl": "public-read"
+      }
+    }
+  ]
+}
