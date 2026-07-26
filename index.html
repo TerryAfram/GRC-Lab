@@ -3,194 +3,235 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GRC Policy-as-Code Dashboard</title>
+  <title>GRC Policy Dashboard</title>
   <style>
     :root {
-      color-scheme: light;
-      --bg: #f4f7f6;
-      --panel: #ffffff;
-      --panel-alt: #f8fbfa;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --primary: #0f4c81;
-      --accent: #1d73c5;
-      --success: #16a34a;
-      --danger: #dc2626;
-      --border: #d1d5db;
+      color-scheme: dark;
+      --bg: #07101b;
+      --panel: #0f1d2b;
+      --panel-soft: rgba(15,29,43,.8);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-strong: #0ea5e9;
+      --success: #22c55e;
+      --warning: #facc15;
+      --danger: #f97316;
+      --border: rgba(148,163,184,.18);
+      --radius: 22px;
+      --shadow: 0 35px 120px rgba(0,0,0,.28);
+    }
+    * {
+      box-sizing: border-box;
     }
     body {
       margin: 0;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top left, rgba(29,115,197,0.18), transparent 35%),
-                  linear-gradient(180deg, #eef5f9 0%, #f4f7f6 100%);
-      color: var(--text);
       min-height: 100vh;
+      background: radial-gradient(circle at top left, rgba(56,189,248,.16), transparent 20%),
+                  radial-gradient(circle at bottom right, rgba(16,185,129,.12), transparent 18%),
+                  linear-gradient(180deg, #0b1721 0%, #07101b 100%);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     header {
-      padding: 48px 24px 20px;
+      padding: 48px 24px 8px;
       text-align: center;
+      max-width: 1080px;
+      margin: 0 auto;
     }
     header h1 {
       margin: 0;
-      font-size: clamp(2.5rem, 4vw, 3.5rem);
+      font-size: clamp(2.5rem, 4vw, 3.8rem);
       letter-spacing: -0.04em;
     }
     header p {
-      margin: 16px auto 0;
-      max-width: 720px;
+      margin: 18px auto 0;
+      max-width: 760px;
       color: var(--muted);
-      line-height: 1.8;
+      line-height: 1.75;
+      font-size: 1rem;
     }
-    .layout {
+    .grid {
       display: grid;
+      grid-template-columns: 1.4fr 0.95fr;
       gap: 24px;
-      max-width: 1180px;
-      margin: 0 auto 48px;
+      max-width: 1080px;
+      margin: 32px auto 48px;
       padding: 0 24px 24px;
-      grid-template-columns: minmax(0, 1fr) 360px;
     }
-    .panel {
+    .card {
       background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: 24px;
-      box-shadow: 0 24px 60px rgba(15, 35, 64, 0.08);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
       padding: 28px;
+      overflow: hidden;
     }
-    .panel h2 {
-      margin-top: 0;
-      font-size: 1.5rem;
+    .card-title {
+      margin: 0 0 20px;
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
     }
-    .section {
-      margin-bottom: 24px;
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(56,189,248,.12);
+      color: var(--accent);
+      font-size: .92rem;
+      margin-bottom: 18px;
     }
-    .section:last-child {
-      margin-bottom: 0;
-    }
-    .grid-2 {
+    .pane {
       display: grid;
-      gap: 20px;
-      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .textarea-group {
+      display: grid;
+      gap: 12px;
     }
     label {
-      display: block;
-      margin-bottom: 10px;
-      font-weight: 600;
-      color: var(--text);
+      color: var(--muted);
+      font-size: .95rem;
     }
     textarea {
       width: 100%;
-      min-height: 260px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      background: var(--panel-alt);
-      padding: 16px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 0.96rem;
+      min-height: 190px;
+      border-radius: 20px;
+      border: 1px solid rgba(148,163,184,.16);
+      background: #112432;
       color: var(--text);
-      box-sizing: border-box;
+      padding: 18px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: .96rem;
+      line-height: 1.6;
       resize: vertical;
     }
-    .button-row {
+    input[type="text"] {
+      width: 100%;
+      border-radius: 16px;
+      border: 1px solid rgba(148,163,184,.16);
+      background: #112432;
+      color: var(--text);
+      padding: 14px 16px;
+      font-size: .95rem;
+    }
+    .actions {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
-      align-items: center;
-      margin-top: 16px;
+      margin-top: 8px;
     }
-    button,
-    .button-link {
-      padding: 12px 18px;
-      border-radius: 999px;
+    .button {
       border: none;
+      border-radius: 999px;
       cursor: pointer;
+      padding: 14px 22px;
       font-weight: 700;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
     }
-    button:hover,
-    .button-link:hover {
+    .button:hover {
       transform: translateY(-1px);
-      box-shadow: 0 12px 28px rgba(15, 35, 64, 0.12);
+      box-shadow: 0 18px 32px rgba(0,0,0,.22);
     }
-    button.primary {
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      color: white;
-    }
-    button.secondary {
-      background: white;
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-    .note {
-      padding: 16px;
-      border-radius: 16px;
-      background: #eef6ff;
-      border: 1px solid rgba(15, 73, 189, 0.14);
-      color: #0f4c81;
-      line-height: 1.7;
-    }
-    .info-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .info-list li {
-      padding: 10px 0;
-      border-bottom: 1px solid #eaecf0;
-    }
-    .info-list li:last-child { border-bottom: none; }
-    .info-list a {
-      color: var(--primary);
-      text-decoration: none;
-    }
+    .button.primary { background: linear-gradient(135deg, #0ea5e9, #22d3ee); color: #06121c; }
+    .button.secondary { background: rgba(255,255,255,.06); color: var(--text); }
+    .button.ghost { background: transparent; border: 1px solid rgba(148,163,184,.24); color: var(--text); }
     .status-box {
+      background: #09141f;
+      border: 1px solid rgba(148,163,184,.12);
+      border-radius: 22px;
+      min-height: 180px;
+      padding: 22px;
       white-space: pre-wrap;
-      background: #111827;
-      color: #f8fafc;
-      border-radius: 16px;
-      padding: 18px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 0.94rem;
-      min-height: 120px;
+      line-height: 1.7;
+      color: var(--text);
       overflow-x: auto;
     }
-    .status-box.empty {
-      color: var(--muted);
-    }
+    .status-box.empty { color: var(--muted); }
+    .status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; font-size: .92rem; }
+    .status-pill.live { background: rgba(34,197,94,.12); color: #86efac; }
+    .status-pill.pending { background: rgba(250,204,21,.12); color: #fde68a; }
+    .info-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+    .info-list a { color: var(--accent); text-decoration: none; }
+    .info-list li { display: flex; justify-content: space-between; gap: 12px; padding: 14px 16px; background: rgba(255,255,255,.04); border-radius: 18px; }
+    .info-list strong { color: var(--text); }
     .footer {
-      max-width: 1180px;
-      margin: 0 auto 40px;
-      padding: 0 24px;
-      color: var(--muted);
-      font-size: 0.95rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      justify-content: center;
       text-align: center;
+      color: var(--muted);
+      margin: 0 auto 36px;
+      max-width: 1080px;
+      padding: 0 24px;
+      font-size: .92rem;
     }
     @media (max-width: 960px) {
-      .layout { grid-template-columns: 1fr; }
-      .grid-2 { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>GRC Policy-as-Code Dashboard</h1>
-    <p>Static GitHub Pages dashboard for policy-as-code learning. Edit the sample JSON and Rego policy in your browser, then run the evaluation locally or deploy the backend separately.</p>
+    <p class="pill">GRC Policy-as-Code Playground</p>
+    <h1>Developer dashboard for GRC workflows</h1>
+    <p>Use the editor below to manage policy input and Rego rules. Connect to a deployed backend for live evaluation results.</p>
   </header>
 
-  <main class="layout">
-    <section class="panel">
-      <div class="section">
-        <h2>Dashboard workspace</h2>
-        <p class="note">This page is a static front-end. Actual policy evaluation is not available on GitHub Pages. Use the local app or a separate backend service for live results.</p>
+  <main class="grid">
+    <div class="left-column">
+      <div id="homePanel" class="card">
+        <div class="card-title">Home</div>
+        <p style="color:var(--muted); margin-bottom:12px">Welcome — quick links and an overview of the GRC labs in this repository.</p>
+        <ul class="info-list">
+          <li><strong>Repository</strong><a href="https://github.com/Johnbjoseph-cybersec/GRC-Playground">GRC-Playground</a></li>
+          <li><strong>Policy-As-Code</strong><a href="Policy-As-Code/">Policy-As-Code folder</a></li>
+          <li><strong>Control Mapping</strong><a href="Control-Mapping/">Control-Mapping folder</a></li>
+          <li><strong>Live Backend</strong><a id="backendLink" href="https://grc-lab-1.onrender.com">Render backend</a></li>
+        </ul>
+        <div style="margin-top:16px;">
+          <div class="card-title" style="font-size:1.05rem; margin-bottom:8px">Available labs & policies</div>
+          <ul class="info-list">
+            <li><strong>AC-12</strong><a href="Policy-As-Code/ac-12/ac-12.rego">ac-12.rego</a></li>
+            <li><strong>Deny Public S3</strong><a href="Policy-As-Code/Lab%2001-Deny-Public-S3/deny-public-s3.rego">deny-public-s3.rego</a></li>
+            <li><strong>IAM Policy Audits</strong><a href="Policy-As-Code/IAM-Policy-Audits/policy/iam.rego">iam.rego</a></li>
+            <li><strong>Block Open SGs</strong><a href="Policy-As-Code/Lab%2002-Block-Open-Security-Groups/policy/deny-open-sg.rego">deny-open-sg.rego</a></li>
+          </ul>
+        </div>
+          <div style="margin-top:18px; display:flex; gap:12px">
+            <button class="button primary" id="openLabs">Open GRC Lab</button>
+            <button class="button ghost" id="goHomeReadme">Open README</button>
+          </div>
+
+          <div style="margin-top:20px">
+            <div class="card-title" style="font-size:1.05rem; margin-bottom:8px">Workspace</div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:12px">
+              <button class="button ghost" id="tileDashboard">Dashboard</button>
+              <button class="button ghost" id="tileLearn">LEARN & PRACTICE</button>
+              <button class="button ghost" id="tileAI">AI AGENT</button>
+              <button class="button ghost" id="tileInventory">INVENTORY & POLICIES</button>
+              <button class="button ghost" id="tileRisk">RISK & CONTROLS</button>
+              <button class="button ghost" id="tileAudit">AUDIT & COMPLIANCE</button>
+              <button class="button ghost" id="tileResilience">RESILIENCE & CONTINUITY</button>
+              <button class="button ghost" id="tileGovernance">GOVERNANCE & OPS</button>
+              <button class="button ghost" id="tileReporting">REPORTING</button>
+            </div>
+
+            <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px">
+              <button class="button secondary" id="loadDemo">Load Demo Data</button>
+              <button class="button primary" id="backupBtn">Back Up</button>
+              <button class="button ghost" id="restoreBtn">Restore</button>
+            </div>
+            <div id="backupStatus" style="color:var(--muted); font-size:0.95rem">No backup yet — click Back Up to protect your progress: add to GRC Lab on left side menu bar</div>
+          </div>
       </div>
 
-      <div class="grid-2">
-        <div class="section">
-          <label for="jsonInput">Sample configuration JSON</label>
-          <textarea id="jsonInput" spellcheck="false">{
+      <section id="labsPanel" class="card" style="display:none;">
+        <div class="card-title">Live policy editor</div>
+        <div class="pane">
+          <div class="textarea-group">
+            <label for="jsonInput">Configuration JSON</label>
+            <textarea id="jsonInput" spellcheck="false">{
   "resources": [
     {
       "type": "aws_s3_bucket",
@@ -200,10 +241,10 @@
     }
   ]
 }</textarea>
-        </div>
-        <div class="section">
-          <label for="regoInput">Sample Rego policy</label>
-          <textarea id="regoInput" spellcheck="false">package main
+          </div>
+          <div class="textarea-group">
+            <label for="regoInput">Rego policy</label>
+            <textarea id="regoInput" spellcheck="false">package main
 
 deny[msg] {
   r := input.resources[_]
@@ -211,86 +252,125 @@ deny[msg] {
   r.values.acl == "public-read"
   msg = "S3 bucket is publicly accessible"
 }</textarea>
+          </div>
+          <div class="textarea-group">
+            <label for="backendUrl">Backend API URL</label>
+            <input id="backendUrl" type="text" value="https://grc-lab-1.onrender.com" />
+          </div>
+
+          <div class="actions">
+            <button class="button ghost" id="backHome">Back to Home</button>
+            <button class="button primary" id="evaluateButton">Evaluate rules</button>
+            <button class="button secondary" id="previewButton">Preview payload</button>
+            <button class="button ghost" id="downloadInput">Download JSON</button>
+            <button class="button ghost" id="downloadPolicy">Download Rego</button>
+          </div>
         </div>
+      </section>
+      <section id="learnPanel" class="card" style="display:none;">
+        <div class="card-title">LEARN & PRACTICE</div>
+        <div class="pane">
+          <div style="display:grid; gap:10px">
+            <button class="button ghost" id="startHere">Start Here</button>
+            <button class="button ghost" id="guideBtn">Guide</button>
+            <button class="button ghost" id="frameworksBtn">Frameworks 480+</button>
+            <button class="button ghost" id="glossaryBtn">GRC Glossary</button>
+            <button class="button ghost" id="practiceScenariosBtn">Practice Scenarios</button>
+            <button class="button ghost" id="guidedMissionsBtn">Guided Missions Lab</button>
+            <button class="button ghost" id="isoBtn">ISO 27001 Lead Implementer</button>
+            <button class="button ghost" id="interviewPrepBtn">Interview Prep Lab</button>
+            <button class="button ghost" id="projectsBtn">Projects (0)</button>
+            <button class="button ghost" id="portfolioBtn">Portfolio Builder</button>
+          </div>
+          <div class="actions" style="margin-top:12px">
+            <button class="button ghost" id="backHomeLearn">Back to Home</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="card">
+      <div class="card-title">Deployment & status</div>
+      <div id="healthPill" class="status-pill pending">Checking backend...</div>
+      <div class="status-box empty" id="statusOutput">Enter your backend URL and click Evaluate to run live policy checks.
+
+This front end is static on GitHub Pages; the backend is hosted separately on Render.</div>
+      <div class="actions" style="margin-top: 16px; justify-content: flex-start;">
+        <button class="button ghost" id="healthButton">Check backend health</button>
       </div>
 
-      <div class="section">
-        <label for="backendUrl">Backend API URL</label>
-        <textarea id="backendUrl" rows="1" spellcheck="false">http://localhost:8080</textarea>
-      </div>
-      <div class="button-row">
-        <button class="primary" id="previewButton">Preview inputs</button>
-        <button class="secondary" id="evaluateButton">Evaluate via API</button>
-        <button class="secondary" id="downloadInput">Download JSON</button>
-        <button class="secondary" id="downloadPolicy">Download Rego</button>
-      </div>
-
-      <div class="section" style="margin-top:24px;">
-        <h2>Evaluation output</h2>
-        <div id="statusOutput" class="status-box empty">Actual evaluation is only available in the local Flask app or a deployed backend.
-
-To run locally:
-1. Start the app with <code>python3 app.py</code>
-2. Open <code>http://localhost:8080</code>
-
-To deploy a live backend, host the Flask app separately and set the Backend API URL above.</div>
-      </div>
-    </section>
-
-    <aside class="panel">
-      <div class="section">
-        <h2>Quick links</h2>
-        <ul class="info-list">
-          <li><a href="https://github.com/TerryAfram/GRC-Lab">Repository</a></li>
-          <li><a href="https://github.com/TerryAfram/GRC-Lab/tree/main/Policy-As-Code">Policy-as-Code labs</a></li>
-          <li><a href="https://github.com/TerryAfram/GRC-Lab/tree/main/Control-Mapping">Control mapping labs</a></li>
-          <li><a href="https://github.com/TerryAfram/GRC-Lab/blob/main/app.py">Local Flask app source</a></li>
-          <li><a href="https://terryafram.github.io/GRC-Lab/">GitHub Pages site</a></li>
-        </ul>
-      </div>
-
-      <div class="section">
-        <h2>How it works</h2>
-        <p>GitHub Pages serves only static files. The editor experience on this page is client-side only, and it does not execute policy evaluation in the browser.</p>
-      </div>
-
-      <div class="section">
-        <h2>Local run</h2>
-        <p class="note">To get a working policy-as-code command center, run the app locally in your dev container with:</p>
-        <p><code>python3 app.py</code></p>
-      </div>
+      <div class="card-title" style="margin-top: 26px;">Quick links</div>
+      <ul class="info-list">
+        <li><span>Repo</span><a href="https://github.com/TerryAfram/GRC-Lab">TerryAfram/GRC-Lab</a></li>
+        <li><span>Policy lab</span><a href="https://github.com/TerryAfram/GRC-Lab/tree/main/Policy-As-Code">Policy-As-Code</a></li>
+        <li><span>Control mapping</span><a href="https://github.com/TerryAfram/GRC-Lab/tree/main/Control-Mapping">Control-Mapping</a></li>
+      </ul>
     </aside>
   </main>
 
-  <footer class="footer">
-    <div>Static dashboard generated for GitHub Pages.</div>
-    <div>Use the local Flask app for real policy evaluation.</div>
-  </footer>
+  <footer class="footer">Static dashboard served by GitHub Pages. Backend API hosted on Render.</footer>
 
   <script>
     const jsonArea = document.getElementById('jsonInput');
     const regoArea = document.getElementById('regoInput');
     const backendUrlInput = document.getElementById('backendUrl');
     const statusOutput = document.getElementById('statusOutput');
+    const healthPill = document.getElementById('healthPill');
+    const healthButton = document.getElementById('healthButton');
 
-    const renderStatus = (message, success = null) => {
+    const setStatus = (text, kind) => {
       statusOutput.classList.remove('empty');
-      statusOutput.textContent = message;
-      statusOutput.style.borderColor = success === true ? '#16a34a' : success === false ? '#dc2626' : 'var(--border)';
+      statusOutput.textContent = text;
+      statusOutput.style.borderColor = kind === 'success' ? 'rgba(34,197,94,.24)' : kind === 'error' ? 'rgba(249,115,22,.24)' : 'rgba(148,163,184,.18)';
+    };
+
+    const setHealth = (message, status) => {
+      healthPill.textContent = message;
+      healthPill.className = 'status-pill ' + (status === 'online' ? 'live' : status === 'offline' ? 'danger' : 'pending');
+    };
+
+    const backendHealthUrl = () => backendUrlInput.value.trim().replace(/\/$/, '') + '/api/health';
+
+    const checkBackendHealth = async () => {
+      const healthUrl = backendHealthUrl();
+      if (!healthUrl || healthUrl === '/api/health') {
+        setHealth('Enter backend URL', 'offline');
+        return;
+      }
+
+      setHealth('Checking backend...', 'pending');
+      try {
+        const response = await fetch(healthUrl, { method: 'GET' });
+        if (response.ok) {
+          const result = await response.json().catch(() => null);
+          const message = result?.status === 'ok' ? 'Backend online' : 'Backend replied';
+          setHealth(message, 'online');
+          setStatus('✅ Backend is healthy. ' + (result?.message || 'Ready for evaluation.'), 'success');
+        } else {
+          setHealth('Backend unhealthy', 'offline');
+          setStatus('❌ Health check failed with status ' + response.status + '.', 'error');
+        }
+      } catch (err) {
+        setHealth('Backend unreachable', 'offline');
+        setStatus('❌ Cannot reach backend: ' + err.message, 'error');
+      }
     };
 
     document.getElementById('previewButton').addEventListener('click', () => {
-      renderStatus('Previewing current inputs...\n\nConfiguration JSON:\n' + jsonArea.value + '\n\nRego policy:\n' + regoArea.value + '\n\nNote: This is a local preview only. Run the Flask app locally or deploy the backend for real evaluation.');
+      setStatus('Previewing payload...\n\n' +
+        'JSON:\n' + jsonArea.value + '\n\n' +
+        'Rego:\n' + regoArea.value + '\n\n' +
+        'Tip: use the Evaluate button to send these values to a deployed backend.');
     });
 
     document.getElementById('evaluateButton').addEventListener('click', async () => {
       const backendUrl = backendUrlInput.value.trim().replace(/\/$/, '');
       if (!backendUrl) {
-        renderStatus('Please enter a valid backend API URL before evaluating.', false);
+        setStatus('Please enter a valid backend URL before evaluating.', 'error');
         return;
       }
 
-      renderStatus('Sending evaluation request to ' + backendUrl + '/api/evaluate ...');
+      setStatus('Sending evaluation request to ' + backendUrl + '/api/evaluate ...');
 
       try {
         const response = await fetch(backendUrl + '/api/evaluate', {
@@ -298,35 +378,142 @@ To deploy a live backend, host the Flask app separately and set the Backend API 
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ json_data: jsonArea.value, rego_data: regoArea.value }),
         });
-
         const result = await response.json();
         if (response.ok) {
-          renderStatus('✅ Success!\n\n' + result.output, true);
+          setStatus('✅ Evaluation completed successfully.\n\n' + result.output, 'success');
         } else {
-          renderStatus('❌ Evaluation failed with status ' + response.status + ':\n\n' + result.output, false);
+          setStatus('❌ Evaluation failed (status ' + response.status + ').\n\n' + result.output, 'error');
         }
-      } catch (error) {
-        renderStatus('Network error when calling backend: ' + error.message + '\n\nMake sure the backend URL is correct and supports CORS.', false);
+      } catch (err) {
+        setStatus('Network error: ' + err.message + '\n\nCheck the backend URL and CORS policy.', 'error');
       }
     });
 
-    function downloadFile(filename, content) {
-      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const downloadFile = (name, text) => {
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = filename;
+      link.download = name;
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
-    }
+      link.remove();
+    };
+
+    const homePanel = document.getElementById('homePanel');
+    const labsPanel = document.getElementById('labsPanel');
+    const openLabsBtn = document.getElementById('openLabs');
+    const backHomeBtn = document.getElementById('backHome');
+    const goHomeReadmeBtn = document.getElementById('goHomeReadme');
+
+    openLabsBtn.addEventListener('click', () => {
+      homePanel.style.display = 'none';
+      labsPanel.style.display = 'block';
+      checkBackendHealth();
+    });
+    backHomeBtn.addEventListener('click', () => {
+      labsPanel.style.display = 'none';
+      learnPanel.style.display = 'none';
+      homePanel.style.display = 'block';
+    });
+    goHomeReadmeBtn.addEventListener('click', () => {
+      window.open('https://github.com/Johnbjoseph-cybersec/GRC-Playground/blob/main/README.md', '_blank');
+    });
+
+    // Demo data and backup/restore
+    const loadDemoBtn = document.getElementById('loadDemo');
+    const backupBtn = document.getElementById('backupBtn');
+    const restoreBtn = document.getElementById('restoreBtn');
+    const backupStatus = document.getElementById('backupStatus');
+    const availableList = homePanel.querySelector('.info-list');
+
+    const DEMO_JSON = JSON.stringify({
+      resources: [{ type: 'aws_s3_bucket', values: { acl: 'public-read' } }]
+    }, null, 2);
+    const DEMO_REGO = `package main
+
+deny[msg] {
+  r := input.resources[_]
+  r.type == "aws_s3_bucket"
+  r.values.acl == "public-read"
+  msg = "S3 bucket is publicly accessible"
+}`;
+
+    loadDemoBtn.addEventListener('click', () => {
+      jsonArea.value = DEMO_JSON;
+      regoArea.value = DEMO_REGO;
+      // open labs editor
+      openLabsBtn.click();
+      setStatus('Demo data loaded into the editor.', 'success');
+    });
+
+    backupBtn.addEventListener('click', () => {
+      const payload = { json: jsonArea.value, rego: regoArea.value, ts: new Date().toISOString() };
+      localStorage.setItem('grc_backup', JSON.stringify(payload));
+      backupStatus.textContent = 'Backed up at ' + new Date().toLocaleString() + ' — added to GRC Lab.';
+      // add to available labs list
+      const li = document.createElement('li');
+      const strong = document.createElement('strong');
+      strong.textContent = 'Backup';
+      const a = document.createElement('a');
+      a.href = '#';
+      a.textContent = 'Restore from backup';
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        restoreBtn.click();
+      });
+      li.appendChild(strong);
+      li.appendChild(a);
+      availableList.insertBefore(li, availableList.firstChild);
+    });
+
+    restoreBtn.addEventListener('click', () => {
+      const raw = localStorage.getItem('grc_backup');
+      if (!raw) {
+        backupStatus.textContent = 'No backup found. Create one using Back Up.';
+        return;
+      }
+      const payload = JSON.parse(raw);
+      jsonArea.value = payload.json;
+      regoArea.value = payload.rego;
+      backupStatus.textContent = 'Restored backup from ' + new Date(payload.ts).toLocaleString();
+      // open labs editor for user
+      openLabsBtn.click();
+      setStatus('Backup restored into the editor.', 'success');
+    });
+
+    // Tiles can focus into specific sections; open Learn panel for the Learn tile
+    document.getElementById('tileDashboard').addEventListener('click', () => { window.scrollTo({top:0, behavior:'smooth'}); });
+    document.getElementById('tileLearn').addEventListener('click', () => {
+      homePanel.style.display = 'none';
+      labsPanel.style.display = 'none';
+      learnPanel.style.display = 'block';
+    });
+    document.getElementById('tileAI').addEventListener('click', () => { alert('AI AGENT: not configured yet.'); });
+    document.getElementById('tileInventory').addEventListener('click', () => { openLabsBtn.click(); });
+    document.getElementById('tileRisk').addEventListener('click', () => { alert('RISK & CONTROLS: use AC-12 and policy audits.'); });
+    document.getElementById('tileAudit').addEventListener('click', () => { alert('AUDIT & COMPLIANCE: run evaluations and export reports.'); });
+    document.getElementById('tileResilience').addEventListener('click', () => { alert('RESILIENCE & CONTINUITY: not configured.'); });
+    document.getElementById('tileGovernance').addEventListener('click', () => { alert('GOVERNANCE & OPS: not configured.'); });
+    document.getElementById('tileReporting').addEventListener('click', () => { alert('REPORTING: not configured.'); });
+
+    // Learn panel back button
+    document.getElementById('backHomeLearn').addEventListener('click', () => {
+      learnPanel.style.display = 'none';
+      homePanel.style.display = 'block';
+    });
+
+    healthButton.addEventListener('click', checkBackendHealth);
+    backendUrlInput.addEventListener('change', () => setHealth('Backend URL updated', 'pending'));
+    backendUrlInput.addEventListener('blur', checkBackendHealth);
 
     document.getElementById('downloadInput').addEventListener('click', () => {
       downloadFile('input.json', jsonArea.value);
     });
-
     document.getElementById('downloadPolicy').addEventListener('click', () => {
       downloadFile('policy.rego', regoArea.value);
     });
+
+    window.addEventListener('load', checkBackendHealth);
   </script>
 </body>
 </html>
