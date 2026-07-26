@@ -29,7 +29,7 @@
   <div class="wrap">
     <div class="topbar">
       <div class="header">
-        <div class="avatar"><img id="profileImage" src="/api/profile.jpg" alt="Profile"></div>
+        <div class="avatar"><img id="profileImage" src="/static/picterry.jpeg" alt="Profile" onerror="this.onerror=null;this.src='/api/profile.jpg'" /></div>
         <div>
           <h1>Projects & Open Source</h1>
           <p class="lead">Repositories and technologies — bold, scannable cards for recruiters.</p>
@@ -50,12 +50,20 @@
   <script>
     const reposContainer = document.getElementById('repos');
 
-    const languageIcon = (lang) => {
-      if (!lang) return '•';
-      const map = {
-        'Python':'🐍','JavaScript':'⚡','TypeScript':'🟦','Go':'🐹','Shell':'🐚','Terraform':'🔧','HTML':'🌐','CSS':'🎨','Java':'☕','Ruby':'💎'
-      };
-      return map[lang] || '•';
+    const svgForLang = (lang) => {
+      const L = (txt, bg) => ` <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:6px"><rect width="24" height="24" rx="4" fill="${bg}"/><text x="12" y="16" font-size="12" text-anchor="middle" fill="#06121c" font-weight="700">${txt}</text></svg>`;
+      const key = (lang||'').toLowerCase();
+      if (key.includes('python')) return L('Py','#ffd43b');
+      if (key.includes('javascript')) return L('JS','#f7df1e');
+      if (key.includes('typescript')) return L('TS','#3178c6');
+      if (key.includes('go')) return L('Go','#00add8');
+      if (key.includes('terraform')) return L('Tf','#7b6ef6');
+      if (key.includes('html')) return L('HT','#e34f26');
+      if (key.includes('css')) return L('CS','#2965f1');
+      if (key.includes('java')) return L('Jv','#f89820');
+      if (key.includes('ruby')) return L('Rb','#cc342d');
+      if (key.includes('shell') || key.includes('bash')) return L('Sh','#89e051');
+      return L((lang||'??').slice(0,2).toUpperCase(),'#94a3b8');
     };
 
     const renderRepo = (r) => {
@@ -63,8 +71,32 @@
       const title = `<div class="repo-title"><a href="${r.html_url}" target="_blank" style="color:var(--text);text-decoration:none">${r.name}</a></div>`;
       const desc = `<div class="repo-desc">${r.description||''}</div>`;
       const meta = `<div class="meta">⭐ ${r.stargazers_count} • Forks ${r.forks_count} • ${r.language||'—'}</div>`;
-      const languages = `<div class="chips"><div class="chip">${languageIcon(r.language)} ${r.language||'Unknown'}</div></div>`;
+      const languages = `<div class="chips" data-repo="${r.name}"><div class="chip">${svgForLang(r.language)} ${r.language||'Unknown'}</div></div>`;
       el.innerHTML = title + desc + meta + languages;
+
+      // Fetch detailed languages for the repo and update chips
+      (async () => {
+        try {
+          const resp = await fetch(`https://api.github.com/repos/TerryAfram/${r.name}/languages`);
+          if (!resp.ok) return;
+          const data = await resp.json();
+          const langs = Object.keys(data || {});
+          const container = el.querySelector('.chips');
+          container.innerHTML = '';
+          if (!langs.length) {
+            container.innerHTML = `<div class="chip">${svgForLang(r.language)} ${r.language||'Unknown'}</div>`;
+          } else {
+            langs.slice(0,3).forEach(l => {
+              const chip = document.createElement('div'); chip.className = 'chip';
+              chip.innerHTML = `${svgForLang(l)} ${l}`;
+              container.appendChild(chip);
+            });
+          }
+        } catch (e) {
+          // ignore language errors
+        }
+      })();
+
       return el;
     };
 
