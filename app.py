@@ -243,6 +243,19 @@ def fetch_portfolio_photo():
     return jsonify({'url': f"{base}/api/profile.jpg", 'source': raw_url}), 201
 
 
+@app.get('/projects.html')
+def serve_projects_page():
+    """Serve the static projects.html file from the repository root.
+
+    This allows the deployed Flask app to expose the projects page at `/projects.html`.
+    """
+    root = os.getcwd()
+    projects_path = os.path.join(root, 'projects.html')
+    if not os.path.exists(projects_path):
+        abort(404)
+    return send_from_directory(root, 'projects.html')
+
+
 @app.post("/")
 def evaluate():
     json_content = request.form.get("json_data", DEFAULT_JSON.get())
