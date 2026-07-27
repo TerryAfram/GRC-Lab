@@ -17,29 +17,112 @@ HTML_PAGE = """<!DOCTYPE html>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>GRC Policy-as-Code Dashboard</title>
+    <title>Terry Afram-Kumi | GRC & Security Assurance</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background: #f4f7f6; color: #222; }
-        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 900px; }
-        pre { background: #272822; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto; }
-        textarea { width: 100%; font-family: monospace; box-sizing: border-box; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        .success { color: green; }
-        .error { color: red; }
-        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap');
+        .font-serif-custom {
+            font-family: 'Instrument Serif', Georgia, serif;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h2>🛡️ GRC Policy-as-Code Dashboard</h2>
-        <form method="POST">
-            <p><strong>Configuration JSON:</strong><br>
-            <textarea name="json_data" rows="8">{{ json_data }}</textarea></p>
-            <p><strong>Rego Policy:</strong><br>
-            <textarea name="rego_data" rows="8">{{ rego_data }}</textarea></p>
-            <button type="submit">Run Evaluation</button>
-        </form>
-        {{ output_html | safe }}
-    </div>
+<body class="bg-black text-slate-200 min-h-screen flex flex-col antialiased">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="border-b border-zinc-800/80 bg-black/90 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 bg-amber-500 rounded-lg flex items-center justify-center font-bold text-black text-xs tracking-tighter">
+                    GRC
+                </div>
+                <span class="font-bold text-white tracking-wider text-sm uppercase">TERRY AFRAM-KUMI</span>
+            </div>
+            <nav class="flex items-center space-x-6 text-sm font-medium text-zinc-400">
+                <a href="#home" class="text-white underline underline-offset-8 decoration-2 decoration-zinc-500">Home</a>
+                <a href="/projects.html" class="hover:text-white transition">GRC Lab</a>
+                <a href="mailto:aframterry@gmail.com" class="hover:text-amber-400 transition flex items-center space-x-1">
+                    <i class="fa-regular fa-envelope"></i>
+                    <span>aframterry@gmail.com</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-2xl mx-auto px-6 py-12 flex-1 space-y-10">
+
+        <!-- HERO HEADLINE & SUMMARY -->
+        <section class="space-y-6">
+            <h1 class="text-4xl sm:text-5xl font-serif-custom leading-tight text-zinc-100 tracking-wide">
+                Governance works best when it's practical. <br>
+                <span class="italic text-zinc-400">Not just on paper.</span>
+            </h1>
+
+            <p class="text-zinc-400 text-base leading-relaxed font-light">
+                Cybersecurity, Risk Governance & Audit Assurance professional (M.Sc., CISA, PMP). Building automated, evidence-driven security programs focused on cloud compliance, policy-as-code, and AI risk management.
+            </p>
+        </section>
+
+        <!-- OPEN TO ROLES CARD -->
+        <section class="bg-zinc-900/60 border border-zinc-800 rounded-xl p-6 space-y-4">
+            <span class="text-[11px] font-bold uppercase tracking-widest text-zinc-500 block">OPEN TO ROLES</span>
+            <div class="flex flex-wrap gap-2.5">
+                <span class="px-3 py-1.5 bg-zinc-900 border border-zinc-800 text-xs font-medium text-zinc-200 rounded-md">IT Audit Manager</span>
+                <span class="px-3 py-1.5 bg-zinc-900 border border-zinc-800 text-xs font-medium text-zinc-200 rounded-md">Senior IT Auditor</span>
+                <span class="px-3 py-1.5 bg-zinc-900 border border-zinc-800 text-xs font-medium text-zinc-200 rounded-md">Risk & Compliance Specialist</span>
+                <span class="px-3 py-1.5 bg-zinc-900 border border-zinc-800 text-xs font-medium text-zinc-200 rounded-md">AI Governance Lead</span>
+            </div>
+        </section>
+
+        <!-- CERTIFICATIONS & CREDENTIALS BADGES -->
+        <section class="space-y-3">
+            <div class="flex flex-wrap gap-2.5">
+                <span class="px-3.5 py-2 bg-zinc-900/80 border border-zinc-800 text-xs text-zinc-300 rounded-lg">CISA — Certified Information Systems Auditor</span>
+                <span class="px-3.5 py-2 bg-zinc-900/80 border border-zinc-800 text-xs text-zinc-300 rounded-lg">PMP — Project Management Professional</span>
+                <span class="px-3.5 py-2 bg-zinc-900/80 border border-zinc-800 text-xs text-zinc-300 rounded-lg">ISO/IEC 27001 Annex A Alignment</span>
+                <span class="px-3.5 py-2 bg-zinc-900/80 border border-zinc-800 text-xs text-zinc-300 rounded-lg">NIST SP 800-53 Rev 5 & CSF</span>
+                <span class="px-3.5 py-2 bg-zinc-900/80 border border-zinc-800 text-xs text-zinc-300 rounded-lg">SOC 2 Trust Services Criteria</span>
+                <span class="px-3.5 py-2 bg-zinc-900/80 border border-zinc-800 text-xs text-zinc-300 rounded-lg">NIST AI Risk Management Framework</span>
+            </div>
+        </section>
+
+        <!-- ACTION BUTTONS -->
+        <section class="space-y-3 pt-2">
+            <a href="/projects.html" class="block w-full py-3.5 text-center bg-zinc-100 hover:bg-white text-zinc-900 font-semibold text-sm rounded-lg transition shadow-sm">
+                Explore My GRC Lab
+            </a>
+            <a href="mailto:aframterry@gmail.com" class="block w-full py-3.5 text-center bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 font-medium text-sm rounded-lg transition flex items-center justify-center space-x-2">
+                <i class="fa-regular fa-envelope"></i>
+                <span>Get in Touch (aframterry@gmail.com)</span>
+            </a>
+        </section>
+
+        <!-- PROFILE PHOTO SECTION -->
+        <section class="pt-6">
+            <div class="relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl">
+                <img src="/api/profile.jpg" onerror="this.onerror=null; this.src='/static/terry.jpeg';" alt="Terry Afram-Kumi" class="w-full h-96 object-cover object-top grayscale hover:grayscale-0 transition duration-500">
+                <div class="absolute bottom-4 left-0 right-0 flex justify-center">
+                    <span class="px-4 py-1.5 bg-black/75 backdrop-blur-md border border-zinc-700/60 rounded-full text-xs font-mono text-zinc-300 shadow-lg flex items-center space-x-2">
+                        <i class="fa-solid fa-envelope text-amber-400"></i>
+                        <span>aframterry@gmail.com</span>
+                    </span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-zinc-900 py-6 text-center text-xs text-zinc-600">
+        &copy; 2026 Terry Afram-Kumi. All rights reserved.
+    </footer>
+
 </body>
 </html>
 """
@@ -53,9 +136,11 @@ class DEFAULT_JSON:
         config = {
             "resources": [
                 {
+                    "name": "corporate-audit-logs",
                     "type": "aws_s3_bucket",
                     "values": {
-                        "acl": "public-read"
+                        "acl": "public-read",
+                        "encrypted": False
                     },
                 }
             ]
@@ -69,7 +154,14 @@ deny[msg] {
     r := input.resources[_]
     r.type == "aws_s3_bucket"
     r.values.acl == "public-read"
-    msg = "S3 bucket is publicly accessible"
+    msg = "ISO 27001 / NIST-ID.AM-01 Violation: S3 bucket is publicly accessible"
+}
+
+deny[msg] {
+    r := input.resources[_]
+    r.type == "aws_s3_bucket"
+    r.values.encrypted == false
+    msg = "ISO 27001 / NIST-ID.AM-02 Violation: S3 bucket lacks server-side encryption"
 }"""
 
 
@@ -152,7 +244,6 @@ def upload_profile():
     os.makedirs(save_dir, exist_ok=True)
     save_path = os.path.join(save_dir, 'profile.jpg')
     f.save(save_path)
-    # Return a URL that the front-end can use to GET the image via this service
     base = request.host_url.rstrip('/')
     return jsonify({'url': f"{base}/api/profile.jpg"}), 201
 
@@ -166,89 +257,8 @@ def serve_profile():
     return send_from_directory(save_dir, 'profile.jpg')
 
 
-@app.get('/api/github-portfolio')
-def github_portfolio():
-    # Fetch basic repo info from GitHub API for the portfolio repository
-    repo_api = 'https://api.github.com/repos/TerryAfram/GRC-portfolio'
-    try:
-        with urllib.request.urlopen(repo_api, timeout=10) as resp:
-            body = resp.read().decode('utf-8')
-            data = json.loads(body)
-            summary = {
-                'name': data.get('name'),
-                'description': data.get('description'),
-                'stars': data.get('stargazers_count'),
-                'forks': data.get('forks_count'),
-                'url': data.get('html_url')
-            }
-            return jsonify(summary)
-    except Exception as e:
-        return jsonify({'error': 'could not fetch portfolio', 'detail': str(e)}), 502
-
-
-@app.post('/api/fetch-portfolio-photo')
-def fetch_portfolio_photo():
-    """Search the GitHub repo for a likely profile image, download it, and save locally.
-
-    Returns JSON with the served URL on success.
-    """
-    base_api = 'https://api.github.com/repos/TerryAfram/GRC-portfolio/contents'
-    try:
-        with urllib.request.urlopen(base_api, timeout=10) as resp:
-            root = json.loads(resp.read().decode('utf-8'))
-    except Exception as e:
-        return jsonify({'error': 'failed to list repo contents', 'detail': str(e)}), 502
-
-    # helper to search a list of items for image files
-    def find_image(items):
-        for it in items:
-            if it.get('type') == 'file' and it.get('name', '').lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
-                return it.get('path')
-        return None
-
-    image_path = find_image(root)
-    # if not at root, try common folders
-    if not image_path:
-        # look for 'images', 'assets', or 'docs' dirs
-        for dname in ('images', 'assets', 'docs'):
-            try:
-                with urllib.request.urlopen(base_api + '/' + dname, timeout=8) as resp:
-                    items = json.loads(resp.read().decode('utf-8'))
-                    image_path = find_image(items)
-                    if image_path:
-                        break
-            except Exception:
-                continue
-
-    if not image_path:
-        return jsonify({'error': 'no image file found in repository root or common folders'}), 404
-
-    raw_url = f'https://raw.githubusercontent.com/TerryAfram/GRC-portfolio/main/{image_path}'
-    try:
-        with urllib.request.urlopen(raw_url, timeout=15) as resp:
-            data = resp.read()
-    except Exception as e:
-        return jsonify({'error': 'failed to download image', 'detail': str(e)}), 502
-
-    save_dir = os.path.join(os.getcwd(), 'static')
-    os.makedirs(save_dir, exist_ok=True)
-    save_path = os.path.join(save_dir, 'profile.jpg')
-    try:
-        with open(save_path, 'wb') as f:
-            f.write(data)
-    except Exception as e:
-        return jsonify({'error': 'failed to save image', 'detail': str(e)}), 500
-
-    base = request.host_url.rstrip('/')
-    return jsonify({'url': f"{base}/api/profile.jpg", 'source': raw_url}), 201
-
-
 @app.get('/projects.html')
 def serve_projects_page():
-    """Serve the static projects.html file from the repository root.
-
-    This allows the deployed Flask app to expose the projects page at `/projects.html`.
-    """
     root = os.getcwd()
     projects_path = os.path.join(root, 'projects.html')
     if not os.path.exists(projects_path):
@@ -276,9 +286,9 @@ def evaluate():
         result = subprocess.CompletedProcess(cmd, 1, output, "")
 
     if result.returncode == 0:
-        output_html = '<div class="success"><strong>✅ Passed! No violations found.</strong><pre>%s</pre></div>' % output
+        output_html = '<div class="p-4 bg-emerald-950/50 border border-emerald-800 text-emerald-300 rounded-lg"><strong class="flex items-center space-x-2"><i class="fa-solid fa-circle-check"></i><span>Passed! No violations found.</span></strong><pre class="mt-2 text-xs font-mono bg-slate-900 p-3 rounded text-slate-300 overflow-x-auto">%s</pre></div>' % output
     else:
-        output_html = '<div class="error"><strong>❌ Failed! Violations detected:</strong><pre>%s</pre></div>' % output
+        output_html = '<div class="p-4 bg-rose-950/50 border border-rose-800 text-rose-300 rounded-lg"><strong class="flex items-center space-x-2"><i class="fa-solid fa-triangle-exclamation"></i><span>Failed! Violations detected:</span></strong><pre class="mt-2 text-xs font-mono bg-slate-900 p-3 rounded text-slate-300 overflow-x-auto">%s</pre></div>' % output
 
     return render_template_string(
         HTML_PAGE,
@@ -290,5 +300,3 @@ def evaluate():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=get_runtime_port(), debug=False)
-
-
