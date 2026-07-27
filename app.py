@@ -4,7 +4,20 @@ import subprocess
 import urllib.request
 
 from flask import Flask, jsonify, render_template_string, request, send_from_directory, abort
+import streamlit.components.v1 as components
 
+# Google Analytics Visitor Tracking
+GA_MEASUREMENT_ID = "G-XXXXXXXXXX"  # <--- Replace G-XXXXXXXXXX with your real Google Analytics ID
+ga_snippet = f"""
+<script async src="https://www.googletagmanager.com/gtag/js?id={GA_MEASUREMENT_ID}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){{dataLayer.push(arguments);}}
+  gtag('js', new Date());
+  gtag('config', '{GA_MEASUREMENT_ID}');
+</script>
+"""
+components.html(ga_snippet, height=0, width=0)
 
 def get_runtime_port() -> int:
     return int(os.environ.get("PORT", "8080"))
