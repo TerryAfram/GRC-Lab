@@ -1,3 +1,5 @@
+[🚀 Launch Live GRC Lab App](https://grc-lab.onrender.com)
+
 # GRC Playground
 
 **The sandbox for GRC pros to break things, test ideas, and learn by doing.**
