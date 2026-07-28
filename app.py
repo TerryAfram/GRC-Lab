@@ -2,7 +2,7 @@ import json
 import os
 import subprocess
 import urllib.request
-import streamlit.components.v1 as components
+
 from flask import Flask, jsonify, render_template_string, request, send_from_directory, abort
 import streamlit.components.v1 as components
 
@@ -21,7 +21,6 @@ components.html(ga_snippet, height=0, width=0)
 
 def get_runtime_port() -> int:
     return int(os.environ.get("PORT", "8080"))
-
 
 app = Flask(__name__)
 
@@ -140,7 +139,6 @@ HTML_PAGE = """<!DOCTYPE html>
 </html>
 """
 
-
 class DEFAULT_JSON:
     """Default JSON configuration provider."""
 
@@ -160,7 +158,6 @@ class DEFAULT_JSON:
         }
         return json.dumps(config, indent=2)
 
-
 DEFAULT_REGO = """package main
 
 deny[msg] {
@@ -177,7 +174,6 @@ deny[msg] {
     msg = "ISO 27001 / NIST-ID.AM-02 Violation: S3 bucket lacks server-side encryption"
 }"""
 
-
 @app.get("/")
 def index():
     return render_template_string(
@@ -187,16 +183,13 @@ def index():
         output_html="",
     )
 
-
 @app.get("/health")
 def health():
     return "ok", 200
 
-
 @app.get("/api/health")
 def api_health():
     return jsonify({"status": "ok", "message": "API is online"}), 200
-
 
 @app.after_request
 def add_cors_headers(response):
@@ -206,7 +199,6 @@ def add_cors_headers(response):
         response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
     return response
 
-
 @app.route("/api/<path:unused>", methods=["OPTIONS"])
 def api_options(unused):
     response = jsonify({})
@@ -214,7 +206,6 @@ def api_options(unused):
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
     return response
-
 
 @app.post("/api/evaluate")
 def api_evaluate():
@@ -245,7 +236,6 @@ def api_evaluate():
         "rego_data": rego_content,
     }), status_code
 
-
 @app.post('/api/upload-profile')
 def upload_profile():
     if 'file' not in request.files:
@@ -260,7 +250,6 @@ def upload_profile():
     base = request.host_url.rstrip('/')
     return jsonify({'url': f"{base}/api/profile.jpg"}), 201
 
-
 @app.get('/api/profile.jpg')
 def serve_profile():
     save_dir = os.path.join(os.getcwd(), 'static')
@@ -269,7 +258,6 @@ def serve_profile():
         return jsonify({'error': 'Profile image not found'}), 404
     return send_from_directory(save_dir, 'profile.jpg')
 
-
 @app.get('/projects.html')
 def serve_projects_page():
     root = os.getcwd()
@@ -277,7 +265,6 @@ def serve_projects_page():
     if not os.path.exists(projects_path):
         abort(404)
     return send_from_directory(root, 'projects.html')
-
 
 @app.post("/")
 def evaluate():
@@ -309,7 +296,6 @@ def evaluate():
         rego_data=rego_content,
         output_html=output_html,
     )
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=get_runtime_port(), debug=False)
