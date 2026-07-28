@@ -2,7 +2,7 @@ import json
 import os
 import subprocess
 import urllib.request
-
+import streamlit.components.v1 as components
 from flask import Flask, jsonify, render_template_string, request, send_from_directory, abort
 import streamlit.components.v1 as components
 
