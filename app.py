@@ -1,28 +1,20 @@
 import json
 import os
 import subprocess
-import urllib.request
+import tempfile
 
 from flask import Flask, jsonify, render_template_string, request, send_from_directory, abort
-import streamlit.components.v1 as components
-
-# Google Analytics Visitor Tracking
-GA_MEASUREMENT_ID = "G-XXXXXXXXXX"  # <--- Replace G-XXXXXXXXXX with your real Google Analytics ID
-ga_snippet = f"""
-<script async src="https://www.googletagmanager.com/gtag/js?id={GA_MEASUREMENT_ID}"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){{dataLayer.push(arguments);}}
-  gtag('js', new Date());
-  gtag('config', '{GA_MEASUREMENT_ID}');
-</script>
-"""
-components.html(ga_snippet, height=0, width=0)
 
 def get_runtime_port() -> int:
     return int(os.environ.get("PORT", "8080"))
 
 app = Flask(__name__)
+
+ALLOWED_ORIGINS = ("https://kryptongrc.com", "https://www.kryptongrc.com")
+
+def _cors_origin():
+    origin = request.headers.get("Origin")
+    return origin if origin in ALLOWED_ORIGINS else None
 
 HTML_PAGE = """<!DOCTYPE html>
 <html lang="en">
@@ -194,7 +186,9 @@ def api_health():
 @app.after_request
 def add_cors_headers(response):
     if request.path.startswith("/api/"):
-        response.headers["Access-Control-Allow-Origin"] = "*"
+        origin = _cors_origin()
+        if origin:
+            response.headers["Access-Control-Allow-Origin"] = origin
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
     return response
@@ -202,7 +196,9 @@ def add_cors_headers(response):
 @app.route("/api/<path:unused>", methods=["OPTIONS"])
 def api_options(unused):
     response = jsonify({})
-    response.headers["Access-Control-Allow-Origin"] = "*"
+    origin = _cors_origin()
+    if origin:
+        response.headers["Access-Control-Allow-Origin"] = origin
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
     return response
@@ -213,19 +209,23 @@ def api_evaluate():
     json_content = data.get("json_data", DEFAULT_JSON.get())
     rego_content = data.get("rego_data", DEFAULT_REGO)
 
-    with open("temp_input.json", "w", encoding="utf-8") as f:
-        f.write(json_content)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        input_path = os.path.join(tmpdir, "temp_input.json")
+        policy_path = os.path.join(tmpdir, "temp_policy.rego")
 
-    with open("temp_policy.rego", "w", encoding="utf-8") as f:
-        f.write(rego_content)
+        with open(input_path, "w", encoding="utf-8") as f:
+            f.write(json_content)
 
-    cmd = ["conftest", "test", "temp_input.json", "-p", "temp_policy.rego"]
-    try:
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        output = result.stdout or result.stderr
-    except FileNotFoundError:
-        output = "Conftest CLI is not available in this environment."
-        result = subprocess.CompletedProcess(cmd, 1, output, "")
+        with open(policy_path, "w", encoding="utf-8") as f:
+            f.write(rego_content)
+
+        cmd = ["conftest", "test", input_path, "-p", policy_path]
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            output = result.stdout or result.stderr
+        except FileNotFoundError:
+            output = "Conftest CLI is not available in this environment."
+            result = subprocess.CompletedProcess(cmd, 1, output, "")
 
     success = result.returncode == 0
     status_code = 200 if success else 400
@@ -235,20 +235,6 @@ def api_evaluate():
         "json_data": json_content,
         "rego_data": rego_content,
     }), status_code
-
-@app.post('/api/upload-profile')
-def upload_profile():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file provided'}), 400
-    f = request.files['file']
-    if f.filename == '':
-        return jsonify({'error': 'Empty filename'}), 400
-    save_dir = os.path.join(os.getcwd(), 'static')
-    os.makedirs(save_dir, exist_ok=True)
-    save_path = os.path.join(save_dir, 'profile.jpg')
-    f.save(save_path)
-    base = request.host_url.rstrip('/')
-    return jsonify({'url': f"{base}/api/profile.jpg"}), 201
 
 @app.get('/api/profile.jpg')
 def serve_profile():
@@ -271,19 +257,23 @@ def evaluate():
     json_content = request.form.get("json_data", DEFAULT_JSON.get())
     rego_content = request.form.get("rego_data", DEFAULT_REGO)
 
-    with open("temp_input.json", "w", encoding="utf-8") as f:
-        f.write(json_content)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        input_path = os.path.join(tmpdir, "temp_input.json")
+        policy_path = os.path.join(tmpdir, "temp_policy.rego")
 
-    with open("temp_policy.rego", "w", encoding="utf-8") as f:
-        f.write(rego_content)
+        with open(input_path, "w", encoding="utf-8") as f:
+            f.write(json_content)
 
-    cmd = ["conftest", "test", "temp_input.json", "-p", "temp_policy.rego"]
-    try:
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        output = result.stdout or result.stderr
-    except FileNotFoundError:
-        output = "Conftest CLI is not available in this environment."
-        result = subprocess.CompletedProcess(cmd, 1, output, "")
+        with open(policy_path, "w", encoding="utf-8") as f:
+            f.write(rego_content)
+
+        cmd = ["conftest", "test", input_path, "-p", policy_path]
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            output = result.stdout or result.stderr
+        except FileNotFoundError:
+            output = "Conftest CLI is not available in this environment."
+            result = subprocess.CompletedProcess(cmd, 1, output, "")
 
     if result.returncode == 0:
         output_html = '<div class="p-4 bg-emerald-950/50 border border-emerald-800 text-emerald-300 rounded-lg"><strong class="flex items-center space-x-2"><i class="fa-solid fa-circle-check"></i><span>Passed! No violations found.</span></strong><pre class="mt-2 text-xs font-mono bg-slate-900 p-3 rounded text-slate-300 overflow-x-auto">%s</pre></div>' % output
