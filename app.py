@@ -219,7 +219,7 @@ def api_evaluate():
         with open(policy_path, "w", encoding="utf-8") as f:
             f.write(rego_content)
 
-        cmd = ["conftest", "test", input_path, "-p", policy_path]
+        cmd = ["conftest", "test", "--rego-version", "v0", input_path, "-p", policy_path]
         try:
             result = subprocess.run(cmd, capture_output=True, text=True)
             output = result.stdout or result.stderr
@@ -267,7 +267,7 @@ def evaluate():
         with open(policy_path, "w", encoding="utf-8") as f:
             f.write(rego_content)
 
-        cmd = ["conftest", "test", input_path, "-p", policy_path]
+        cmd = ["conftest", "test", "--rego-version", "v0", input_path, "-p", policy_path]
         try:
             result = subprocess.run(cmd, capture_output=True, text=True)
             output = result.stdout or result.stderr
