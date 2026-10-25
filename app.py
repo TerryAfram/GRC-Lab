@@ -20,6 +20,36 @@ CONFTEST_BIN = os.path.join(os.path.dirname(os.path.abspath(__file__)), "conftes
 if not os.path.exists(CONFTEST_BIN):
     CONFTEST_BIN = "conftest"
 
+_conftest_cache = {"path": None}
+
+def _conftest_bin():
+    if _conftest_cache["path"]:
+        return _conftest_cache["path"]
+    bundled = os.path.join(os.path.dirname(os.path.abspath(__file__)), "conftest")
+    if os.path.exists(bundled):
+        _conftest_cache["path"] = bundled
+        return bundled
+    import shutil
+    found = shutil.which("conftest")
+    if found:
+        _conftest_cache["path"] = found
+        return found
+    try:
+        import tarfile
+        import urllib.request
+        url = "https://github.com/open-policy-agent/conftest/releases/download/v0.68.2/conftest_0.68.2_Linux_x86_64.tar.gz"
+        dest_dir = tempfile.mkdtemp(prefix="conftest-bin-")
+        tar_path = os.path.join(dest_dir, "conftest.tar.gz")
+        urllib.request.urlretrieve(url, tar_path)
+        with tarfile.open(tar_path) as tf:
+            tf.extract("conftest", dest_dir)
+        bin_path = os.path.join(dest_dir, "conftest")
+        os.chmod(bin_path, 0o755)
+        _conftest_cache["path"] = bin_path
+        return bin_path
+    except Exception:
+        return "conftest"
+
 HTML_PAGE = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -223,7 +253,7 @@ def api_evaluate():
         with open(policy_path, "w", encoding="utf-8") as f:
             f.write(rego_content)
 
-        cmd = [CONFTEST_BIN, "test", "--rego-version", "v0", input_path, "-p", policy_path]
+        cmd = [_conftest_bin(), "test", "--rego-version", "v0", input_path, "-p", policy_path]
         try:
             result = subprocess.run(cmd, capture_output=True, text=True)
             output = result.stdout or result.stderr
@@ -271,7 +301,7 @@ def evaluate():
         with open(policy_path, "w", encoding="utf-8") as f:
             f.write(rego_content)
 
-        cmd = [CONFTEST_BIN, "test", "--rego-version", "v0", input_path, "-p", policy_path]
+        cmd = [_conftest_bin(), "test", "--rego-version", "v0", input_path, "-p", policy_path]
         try:
             result = subprocess.run(cmd, capture_output=True, text=True)
             output = result.stdout or result.stderr
