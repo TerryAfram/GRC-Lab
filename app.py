@@ -16,6 +16,10 @@ def _cors_origin():
     origin = request.headers.get("Origin")
     return origin if origin in ALLOWED_ORIGINS else None
 
+CONFTEST_BIN = os.path.join(os.path.dirname(os.path.abspath(__file__)), "conftest")
+if not os.path.exists(CONFTEST_BIN):
+    CONFTEST_BIN = "conftest"
+
 HTML_PAGE = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -219,7 +223,7 @@ def api_evaluate():
         with open(policy_path, "w", encoding="utf-8") as f:
             f.write(rego_content)
 
-        cmd = ["conftest", "test", "--rego-version", "v0", input_path, "-p", policy_path]
+        cmd = [CONFTEST_BIN, "test", "--rego-version", "v0", input_path, "-p", policy_path]
         try:
             result = subprocess.run(cmd, capture_output=True, text=True)
             output = result.stdout or result.stderr
@@ -267,7 +271,7 @@ def evaluate():
         with open(policy_path, "w", encoding="utf-8") as f:
             f.write(rego_content)
 
-        cmd = ["conftest", "test", "--rego-version", "v0", input_path, "-p", policy_path]
+        cmd = [CONFTEST_BIN, "test", "--rego-version", "v0", input_path, "-p", policy_path]
         try:
             result = subprocess.run(cmd, capture_output=True, text=True)
             output = result.stdout or result.stderr
